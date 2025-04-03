@@ -1,5 +1,6 @@
 #include <Arduino.h>
 
+
 const uint8_t SENSOR = A4;
 const uint8_t LED = 3;
 const uint8_t POLLING_RATE = 100;
@@ -12,6 +13,14 @@ uint16_t sensor_value_average;
 uint8_t led_value;
 float k = 2;  // You can adjust this value to make the transition sharper or smoother
 
+
+inline void measureLight();
+inline void averageLight();
+inline void mapLed();
+inline void writeLed();
+inline void writeSerial();
+
+
 void setup()
 {
   ledcSetup(0, 490, 8);
@@ -22,6 +31,19 @@ void setup()
 
 void loop()
 {
+  measureLight();
+  averageLight();
+
+  mapLed();
+  writeLed();
+
+  writeSerial();
+  
+  delay(DELAY_TIME);
+}
+
+inline void measureLight()
+{
   sensor_value_sum = 0;
 
   for (int i = 0; i < AVERAGES; i++)
@@ -29,17 +51,27 @@ void loop()
     sensor_value_sum += analogRead(SENSOR);
     delay(PART_DELAY);
   }
-  sensor_value_average = sensor_value_sum / AVERAGES;
-  
-  
-  led_value = 255 * pow((float)(sensor_value_average) / 4096, k);
+}
 
+inline void averageLight()
+{
+  sensor_value_average = sensor_value_sum / AVERAGES;
+}
+
+inline void mapLed()
+{
+  led_value = 255 * pow((float)(sensor_value_average) / 4096, k);
+}
+
+inline void writeLed()
+{
+  ledcWrite(0, led_value);
+}
+
+inline void writeSerial()
+{
   Serial.print(led_value);
   Serial.print(" ");
   Serial.print(sensor_value_average);
   Serial.println();
-  ledcWrite(0, led_value);
-
-
-  delay(DELAY_TIME);
 }
