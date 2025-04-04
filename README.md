@@ -13,4 +13,4 @@ Working well, but needs a bit tidying up.
 - add github pages DONE
 - finish README
 
-[Documentation(GitHub Pages)](https://marco-lind-chasacademy.github.io/Light_sensing_dimmer/index.html)
+[Documentation (GitHub Pages)](https://marco-lind-chasacademy.github.io/Light_sensing_dimmer/index.html)
