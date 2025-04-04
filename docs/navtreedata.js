@@ -24,7 +24,7 @@
 */
 var NAVTREE =
 [
-  [ "Light-sensing dimmer", "index.html", [
+  [ "Light_sensing_dimmer", "index.html", [
     [ "Light_sensing_dimmer", "md__r_e_a_d_m_e.html", [
       [ "Next:", "md__r_e_a_d_m_e.html#autotoc_md1", null ]
     ] ],
