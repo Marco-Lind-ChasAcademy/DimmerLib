@@ -10,4 +10,7 @@ Working well, but needs a bit tidying up.
 - implement class and refactored functions in main.cpp. DONE
 - make TinkerCAD simulation and drawing
 - add doxygen DONE
-- add github pages
+- add github pages DONE
+- finish README
+
+[Documentation(GitHub Pages)](https://marco-lind-chasacademy.github.io/Light_sensing_dimmer/index.html)
