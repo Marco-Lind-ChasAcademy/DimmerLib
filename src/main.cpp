@@ -17,13 +17,25 @@ void setup()
 
 void loop()
 {
-  measureLight(dimmer_1.sensor_value_sum, dimmer_1.AVERAGES, dimmer_1.SENSOR_PIN, dimmer_1.PART_DELAY);
-  averageLight(dimmer_1.sensor_value_average, dimmer_1.sensor_value_sum, dimmer_1.AVERAGES);
+  measureLight(
+    dimmer_1.sensor_value_sum,
+    dimmer_1.AVERAGES,
+    dimmer_1.SENSOR_PIN,
+    dimmer_1.PART_DELAY);
+  averageLight(
+    dimmer_1.sensor_value_average,
+    dimmer_1.sensor_value_sum,
+    dimmer_1.AVERAGES);
 
-  mapLed(dimmer_1.led_value, dimmer_1.sensor_value_average, dimmer_1.k);
+  mapLed(
+    dimmer_1.led_value,
+    dimmer_1.sensor_value_average,
+    dimmer_1.K);
   writeLed(dimmer_1.led_value);
 
-  writeSerial(dimmer_1.led_value, dimmer_1.sensor_value_average);
+  writeSerial(
+    dimmer_1.led_value,
+    dimmer_1.sensor_value_average);
   
   delay(dimmer_1.DELAY_TIME);
 }
