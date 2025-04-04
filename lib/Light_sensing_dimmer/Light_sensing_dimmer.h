@@ -18,7 +18,16 @@ inline void writeSerial(uint8_t led_value, uint16_t sensor_value_average);
 
 
 
-
+/**
+ * @brief Light sensing dimmer object. Initialize with member values
+ * 
+ * @param SENSOR_PIN_ Analog pin to read the light level from
+ * @param LED_PIN_ Digital pin for the dimmable LED
+ * @param POLLING_RATE_ Rate in ms at which the LED updates the light level
+ * @param AVERAGES_ Number of measuring points
+ * @param PART_DELAY_ Delay in ms between each measuring point
+ * @param K_ Constant for the rate of change in the LED brightness
+ */
 class Light_sensing_dimmer
 {
 public:
@@ -34,6 +43,14 @@ public:
     uint8_t led_value;
     const float K = 2;  // You can adjust this value to make the transition sharper or smoother
     
+    /**
+     * @param SENSOR_PIN_ Analog pin to read the light level from
+     * @param LED_PIN_ Digital pin for the dimmable LED
+     * @param POLLING_RATE_ Rate in ms at which the LED updates the light level
+     * @param AVERAGES_ Number of measuring points
+     * @param PART_DELAY_ Delay in ms between each measuring point
+     * @param K_ Constant for the rate of change in the LED brightness
+     */
     Light_sensing_dimmer(
         const uint8_t SENSOR_PIN_,
         const uint8_t LED_PIN_,
@@ -46,16 +63,7 @@ public:
 
 
 
-/**
- * @brief Light sensing dimmer object. Initialize with member values
- * 
- * @param SENSOR_PIN_ Pin to read the light level from
- * @param LED_PIN_ Pin for the dimmable LED
- * @param POLLING_RATE_ Rate at which the LED updates the light level
- * @param AVERAGES_ Number of measuring points
- * @param PART_DELAY_ Delay between each measuring point
- * @param K_ Constant for the rate of change in the LED brightness
- */
+
 Light_sensing_dimmer::Light_sensing_dimmer
 (
     const uint8_t SENSOR_PIN_,
@@ -85,8 +93,8 @@ Light_sensing_dimmer::~Light_sensing_dimmer()
  * 
  * @param sensor_value_sum Sum of the measured values
  * @param AVERAGES Number of measuring points
- * @param SENSOR_PIN Pin to read the light level from
- * @param PART_DELAY Delay between each measuring point
+ * @param SENSOR_PIN Analog pin to read the light level from
+ * @param PART_DELAY Delay in ms between each measuring point
  */
 inline void measureLight(
     uint32_t &sensor_value_sum,
