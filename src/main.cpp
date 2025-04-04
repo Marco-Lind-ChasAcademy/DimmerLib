@@ -3,7 +3,7 @@
 
 
 
-Light_sensing_dimmer dimmer_1(4, 3, 100, 10, 5, 2);
+Light_sensing_dimmer dimmer_1(A4, 3, 100, 10, 5, 2);
 
 
 
