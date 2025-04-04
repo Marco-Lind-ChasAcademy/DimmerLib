@@ -1,0 +1,138 @@
+\doxysection{Light\+\_\+sensing\+\_\+dimmer Class Reference}
+\hypertarget{class_light__sensing__dimmer}{}\label{class_light__sensing__dimmer}\index{Light\_sensing\_dimmer@{Light\_sensing\_dimmer}}
+
+
+{\ttfamily \#include $<$Light\+\_\+sensing\+\_\+dimmer.\+h$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_light__sensing__dimmer_a4ddb730868b0c573ab07f65795d0653f}{Light\+\_\+sensing\+\_\+dimmer}} (const uint8\+\_\+t SENSOR\+\_\+\+PIN\+\_\+, const uint8\+\_\+t LED\+\_\+\+PIN\+\_\+, const uint8\+\_\+t POLLING\+\_\+\+RATE\+\_\+, const uint8\+\_\+t AVERAGES\+\_\+, const uint8\+\_\+t PART\+\_\+\+DELAY\+\_\+, const float \mbox{\hyperlink{class_light__sensing__dimmer_addf14cabab39edc1dd4ee22c1a55b467}{K}})
+\begin{DoxyCompactList}\small\item\em Light sensing dimmer object. Initialize with member values. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_light__sensing__dimmer_adbd9516bd8a740f14d1876622f0eb2d0}{\texorpdfstring{$\sim$}{\string~}\+Light\+\_\+sensing\+\_\+dimmer}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+const uint8\+\_\+t \mbox{\hyperlink{class_light__sensing__dimmer_afab340ccd81aba19e6b8d7672ad11156}{SENSOR\+\_\+\+PIN}}
+\item 
+const uint8\+\_\+t \mbox{\hyperlink{class_light__sensing__dimmer_aa5ecceb7d618987371d9b815dff2cc43}{LED\+\_\+\+PIN}}
+\item 
+const uint8\+\_\+t \mbox{\hyperlink{class_light__sensing__dimmer_a92f9837c0642328f30bafd56fffd88e6}{POLLING\+\_\+\+RATE}}
+\item 
+const uint8\+\_\+t \mbox{\hyperlink{class_light__sensing__dimmer_a2d05278089f85e41f0d5816d45bb1241}{AVERAGES}}
+\item 
+const uint8\+\_\+t \mbox{\hyperlink{class_light__sensing__dimmer_a364ebafb9d9f2084da3e50a8676fcdd8}{PART\+\_\+\+DELAY}}
+\item 
+const uint8\+\_\+t \mbox{\hyperlink{class_light__sensing__dimmer_a716b8f195ecbd8d8b553fa03cc9bbd59}{DELAY\+\_\+\+TIME}}
+\item 
+uint32\+\_\+t \mbox{\hyperlink{class_light__sensing__dimmer_a68be22d423cdc2f541410900a694fc9d}{sensor\+\_\+value\+\_\+sum}}
+\item 
+uint16\+\_\+t \mbox{\hyperlink{class_light__sensing__dimmer_a1c42221a8534e5dd874676b51631785c}{sensor\+\_\+value\+\_\+average}}
+\item 
+uint8\+\_\+t \mbox{\hyperlink{class_light__sensing__dimmer_a6a2e70a21ce6c92cc0211db911bf853d}{led\+\_\+value}}
+\item 
+const float \mbox{\hyperlink{class_light__sensing__dimmer_addf14cabab39edc1dd4ee22c1a55b467}{K}} = 2
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_light__sensing__dimmer_a4ddb730868b0c573ab07f65795d0653f}\index{Light\_sensing\_dimmer@{Light\_sensing\_dimmer}!Light\_sensing\_dimmer@{Light\_sensing\_dimmer}}
+\index{Light\_sensing\_dimmer@{Light\_sensing\_dimmer}!Light\_sensing\_dimmer@{Light\_sensing\_dimmer}}
+\doxysubsubsection{\texorpdfstring{Light\_sensing\_dimmer()}{Light\_sensing\_dimmer()}}
+{\footnotesize\ttfamily \label{class_light__sensing__dimmer_a4ddb730868b0c573ab07f65795d0653f} 
+Light\+\_\+sensing\+\_\+dimmer\+::\+Light\+\_\+sensing\+\_\+dimmer (\begin{DoxyParamCaption}\item[{const uint8\+\_\+t}]{SENSOR\+\_\+\+PIN\+\_\+}{, }\item[{const uint8\+\_\+t}]{LED\+\_\+\+PIN\+\_\+}{, }\item[{const uint8\+\_\+t}]{POLLING\+\_\+\+RATE\+\_\+}{, }\item[{const uint8\+\_\+t}]{AVERAGES\+\_\+}{, }\item[{const uint8\+\_\+t}]{PART\+\_\+\+DELAY\+\_\+}{, }\item[{const float}]{K\+\_\+}{}\end{DoxyParamCaption})}
+
+
+
+Light sensing dimmer object. Initialize with member values. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em SENSOR\+\_\+\+PIN\+\_\+} & Pin to read the light level from \\
+\hline
+{\em LED\+\_\+\+PIN\+\_\+} & Pin for the dimmable LED \\
+\hline
+{\em POLLING\+\_\+\+RATE\+\_\+} & Rate at which the LED updates the light level \\
+\hline
+{\em AVERAGES\+\_\+} & Number of measuring points \\
+\hline
+{\em PART\+\_\+\+DELAY\+\_\+} & Delay between each measuring point \\
+\hline
+{\em K\+\_\+} & Constant for the rate of change in the LED brightness \\
+\hline
+\end{DoxyParams}
+\Hypertarget{class_light__sensing__dimmer_adbd9516bd8a740f14d1876622f0eb2d0}\index{Light\_sensing\_dimmer@{Light\_sensing\_dimmer}!````~Light\_sensing\_dimmer@{\texorpdfstring{$\sim$}{\string~}Light\_sensing\_dimmer}}
+\index{````~Light\_sensing\_dimmer@{\texorpdfstring{$\sim$}{\string~}Light\_sensing\_dimmer}!Light\_sensing\_dimmer@{Light\_sensing\_dimmer}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}Light\_sensing\_dimmer()}{\string~Light\_sensing\_dimmer()}}
+{\footnotesize\ttfamily \label{class_light__sensing__dimmer_adbd9516bd8a740f14d1876622f0eb2d0} 
+Light\+\_\+sensing\+\_\+dimmer\+::\texorpdfstring{$\sim$}{\string~}\+Light\+\_\+sensing\+\_\+dimmer (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{class_light__sensing__dimmer_a2d05278089f85e41f0d5816d45bb1241}\index{Light\_sensing\_dimmer@{Light\_sensing\_dimmer}!AVERAGES@{AVERAGES}}
+\index{AVERAGES@{AVERAGES}!Light\_sensing\_dimmer@{Light\_sensing\_dimmer}}
+\doxysubsubsection{\texorpdfstring{AVERAGES}{AVERAGES}}
+{\footnotesize\ttfamily \label{class_light__sensing__dimmer_a2d05278089f85e41f0d5816d45bb1241} 
+const uint8\+\_\+t Light\+\_\+sensing\+\_\+dimmer\+::\+AVERAGES}
+
+\Hypertarget{class_light__sensing__dimmer_a716b8f195ecbd8d8b553fa03cc9bbd59}\index{Light\_sensing\_dimmer@{Light\_sensing\_dimmer}!DELAY\_TIME@{DELAY\_TIME}}
+\index{DELAY\_TIME@{DELAY\_TIME}!Light\_sensing\_dimmer@{Light\_sensing\_dimmer}}
+\doxysubsubsection{\texorpdfstring{DELAY\_TIME}{DELAY\_TIME}}
+{\footnotesize\ttfamily \label{class_light__sensing__dimmer_a716b8f195ecbd8d8b553fa03cc9bbd59} 
+const uint8\+\_\+t Light\+\_\+sensing\+\_\+dimmer\+::\+DELAY\+\_\+\+TIME}
+
+\Hypertarget{class_light__sensing__dimmer_addf14cabab39edc1dd4ee22c1a55b467}\index{Light\_sensing\_dimmer@{Light\_sensing\_dimmer}!K@{K}}
+\index{K@{K}!Light\_sensing\_dimmer@{Light\_sensing\_dimmer}}
+\doxysubsubsection{\texorpdfstring{K}{K}}
+{\footnotesize\ttfamily \label{class_light__sensing__dimmer_addf14cabab39edc1dd4ee22c1a55b467} 
+const float Light\+\_\+sensing\+\_\+dimmer\+::K = 2}
+
+\Hypertarget{class_light__sensing__dimmer_aa5ecceb7d618987371d9b815dff2cc43}\index{Light\_sensing\_dimmer@{Light\_sensing\_dimmer}!LED\_PIN@{LED\_PIN}}
+\index{LED\_PIN@{LED\_PIN}!Light\_sensing\_dimmer@{Light\_sensing\_dimmer}}
+\doxysubsubsection{\texorpdfstring{LED\_PIN}{LED\_PIN}}
+{\footnotesize\ttfamily \label{class_light__sensing__dimmer_aa5ecceb7d618987371d9b815dff2cc43} 
+const uint8\+\_\+t Light\+\_\+sensing\+\_\+dimmer\+::\+LED\+\_\+\+PIN}
+
+\Hypertarget{class_light__sensing__dimmer_a6a2e70a21ce6c92cc0211db911bf853d}\index{Light\_sensing\_dimmer@{Light\_sensing\_dimmer}!led\_value@{led\_value}}
+\index{led\_value@{led\_value}!Light\_sensing\_dimmer@{Light\_sensing\_dimmer}}
+\doxysubsubsection{\texorpdfstring{led\_value}{led\_value}}
+{\footnotesize\ttfamily \label{class_light__sensing__dimmer_a6a2e70a21ce6c92cc0211db911bf853d} 
+uint8\+\_\+t Light\+\_\+sensing\+\_\+dimmer\+::led\+\_\+value}
+
+\Hypertarget{class_light__sensing__dimmer_a364ebafb9d9f2084da3e50a8676fcdd8}\index{Light\_sensing\_dimmer@{Light\_sensing\_dimmer}!PART\_DELAY@{PART\_DELAY}}
+\index{PART\_DELAY@{PART\_DELAY}!Light\_sensing\_dimmer@{Light\_sensing\_dimmer}}
+\doxysubsubsection{\texorpdfstring{PART\_DELAY}{PART\_DELAY}}
+{\footnotesize\ttfamily \label{class_light__sensing__dimmer_a364ebafb9d9f2084da3e50a8676fcdd8} 
+const uint8\+\_\+t Light\+\_\+sensing\+\_\+dimmer\+::\+PART\+\_\+\+DELAY}
+
+\Hypertarget{class_light__sensing__dimmer_a92f9837c0642328f30bafd56fffd88e6}\index{Light\_sensing\_dimmer@{Light\_sensing\_dimmer}!POLLING\_RATE@{POLLING\_RATE}}
+\index{POLLING\_RATE@{POLLING\_RATE}!Light\_sensing\_dimmer@{Light\_sensing\_dimmer}}
+\doxysubsubsection{\texorpdfstring{POLLING\_RATE}{POLLING\_RATE}}
+{\footnotesize\ttfamily \label{class_light__sensing__dimmer_a92f9837c0642328f30bafd56fffd88e6} 
+const uint8\+\_\+t Light\+\_\+sensing\+\_\+dimmer\+::\+POLLING\+\_\+\+RATE}
+
+\Hypertarget{class_light__sensing__dimmer_afab340ccd81aba19e6b8d7672ad11156}\index{Light\_sensing\_dimmer@{Light\_sensing\_dimmer}!SENSOR\_PIN@{SENSOR\_PIN}}
+\index{SENSOR\_PIN@{SENSOR\_PIN}!Light\_sensing\_dimmer@{Light\_sensing\_dimmer}}
+\doxysubsubsection{\texorpdfstring{SENSOR\_PIN}{SENSOR\_PIN}}
+{\footnotesize\ttfamily \label{class_light__sensing__dimmer_afab340ccd81aba19e6b8d7672ad11156} 
+const uint8\+\_\+t Light\+\_\+sensing\+\_\+dimmer\+::\+SENSOR\+\_\+\+PIN}
+
+\Hypertarget{class_light__sensing__dimmer_a1c42221a8534e5dd874676b51631785c}\index{Light\_sensing\_dimmer@{Light\_sensing\_dimmer}!sensor\_value\_average@{sensor\_value\_average}}
+\index{sensor\_value\_average@{sensor\_value\_average}!Light\_sensing\_dimmer@{Light\_sensing\_dimmer}}
+\doxysubsubsection{\texorpdfstring{sensor\_value\_average}{sensor\_value\_average}}
+{\footnotesize\ttfamily \label{class_light__sensing__dimmer_a1c42221a8534e5dd874676b51631785c} 
+uint16\+\_\+t Light\+\_\+sensing\+\_\+dimmer\+::sensor\+\_\+value\+\_\+average}
+
+\Hypertarget{class_light__sensing__dimmer_a68be22d423cdc2f541410900a694fc9d}\index{Light\_sensing\_dimmer@{Light\_sensing\_dimmer}!sensor\_value\_sum@{sensor\_value\_sum}}
+\index{sensor\_value\_sum@{sensor\_value\_sum}!Light\_sensing\_dimmer@{Light\_sensing\_dimmer}}
+\doxysubsubsection{\texorpdfstring{sensor\_value\_sum}{sensor\_value\_sum}}
+{\footnotesize\ttfamily \label{class_light__sensing__dimmer_a68be22d423cdc2f541410900a694fc9d} 
+uint32\+\_\+t Light\+\_\+sensing\+\_\+dimmer\+::sensor\+\_\+value\+\_\+sum}
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+lib/\+Light\+\_\+sensing\+\_\+dimmer/\mbox{\hyperlink{_light__sensing__dimmer_8h}{Light\+\_\+sensing\+\_\+dimmer.\+h}}\end{DoxyCompactItemize}

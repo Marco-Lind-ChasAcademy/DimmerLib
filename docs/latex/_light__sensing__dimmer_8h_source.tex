@@ -1,0 +1,123 @@
+\doxysection{Light\+\_\+sensing\+\_\+dimmer.\+h}
+\hypertarget{_light__sensing__dimmer_8h_source}{}\label{_light__sensing__dimmer_8h_source}\index{lib/Light\_sensing\_dimmer/Light\_sensing\_dimmer.h@{lib/Light\_sensing\_dimmer/Light\_sensing\_dimmer.h}}
+\mbox{\hyperlink{_light__sensing__dimmer_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{preprocessor}{\#ifndef\ LIGHT\_SENSING\_DIMMER\_H}}
+\DoxyCodeLine{00002\ \textcolor{preprocessor}{\#define\ LIGHT\_SENSING\_DIMMER\_H}}
+\DoxyCodeLine{00003\ }
+\DoxyCodeLine{00004\ }
+\DoxyCodeLine{00005\ \textcolor{preprocessor}{\#include\ <Arduino.h>}}
+\DoxyCodeLine{00006\ }
+\DoxyCodeLine{00007\ }
+\DoxyCodeLine{00008\ }
+\DoxyCodeLine{00009\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{_light__sensing__dimmer_8h_a24774325619ae38e49c056fa7ae9ff6a}{measureLight}}(}
+\DoxyCodeLine{00010\ \ \ \ \ uint32\_t\ \&sensor\_value\_sum,}
+\DoxyCodeLine{00011\ \ \ \ \ \textcolor{keyword}{const}\ uint8\_t\ AVERAGES,}
+\DoxyCodeLine{00012\ \ \ \ \ \textcolor{keyword}{const}\ uint8\_t\ SENSOR\_PIN,}
+\DoxyCodeLine{00013\ \ \ \ \ \textcolor{keyword}{const}\ uint8\_t\ PART\_DELAY);}
+\DoxyCodeLine{00014\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{_light__sensing__dimmer_8h_a690af9ba54be3e9bad17af4993aeafca}{averageLight}}(uint16\_t\ \&sensor\_value\_average,\ uint32\_t\ sensor\_value\_sum,\ \textcolor{keyword}{const}\ uint8\_t\ AVERAGES);}
+\DoxyCodeLine{00015\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{_light__sensing__dimmer_8h_a51dda175a041b589f1502b412e757fef}{mapLed}}(uint8\_t\ \&led\_value,\ uint16\_t\ sensor\_value\_average,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}\ K);}
+\DoxyCodeLine{00016\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{_light__sensing__dimmer_8h_a02d9ef23f2068f5c0b948e703023ae07}{writeLed}}(uint8\_t\ led\_value);}
+\DoxyCodeLine{00017\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{_light__sensing__dimmer_8h_a6f90ea55490a75eece25da7e8e0c134f}{writeSerial}}(uint8\_t\ led\_value,\ uint16\_t\ sensor\_value\_average);}
+\DoxyCodeLine{00018\ }
+\DoxyCodeLine{00019\ }
+\DoxyCodeLine{00020\ }
+\DoxyCodeLine{00021\ }
+\DoxyCodeLine{00022\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_light__sensing__dimmer_a4ddb730868b0c573ab07f65795d0653f}{Light\_sensing\_dimmer}}}
+\DoxyCodeLine{00023\ \{}
+\DoxyCodeLine{00024\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00025\ \ \ \ \ \textcolor{keyword}{const}\ uint8\_t\ \mbox{\hyperlink{class_light__sensing__dimmer_afab340ccd81aba19e6b8d7672ad11156}{SENSOR\_PIN}};}
+\DoxyCodeLine{00026\ \ \ \ \ \textcolor{keyword}{const}\ uint8\_t\ \mbox{\hyperlink{class_light__sensing__dimmer_aa5ecceb7d618987371d9b815dff2cc43}{LED\_PIN}};}
+\DoxyCodeLine{00027\ \ \ \ \ \textcolor{keyword}{const}\ uint8\_t\ \mbox{\hyperlink{class_light__sensing__dimmer_a92f9837c0642328f30bafd56fffd88e6}{POLLING\_RATE}};}
+\DoxyCodeLine{00028\ \ \ \ \ \textcolor{keyword}{const}\ uint8\_t\ \mbox{\hyperlink{class_light__sensing__dimmer_a2d05278089f85e41f0d5816d45bb1241}{AVERAGES}};}
+\DoxyCodeLine{00029\ \ \ \ \ \textcolor{keyword}{const}\ uint8\_t\ \mbox{\hyperlink{class_light__sensing__dimmer_a364ebafb9d9f2084da3e50a8676fcdd8}{PART\_DELAY}};}
+\DoxyCodeLine{00030\ \ \ \ \ \textcolor{keyword}{const}\ uint8\_t\ \mbox{\hyperlink{class_light__sensing__dimmer_a716b8f195ecbd8d8b553fa03cc9bbd59}{DELAY\_TIME}};}
+\DoxyCodeLine{00031\ }
+\DoxyCodeLine{00032\ \ \ \ \ uint32\_t\ \mbox{\hyperlink{class_light__sensing__dimmer_a68be22d423cdc2f541410900a694fc9d}{sensor\_value\_sum}};}
+\DoxyCodeLine{00033\ \ \ \ \ uint16\_t\ \mbox{\hyperlink{class_light__sensing__dimmer_a1c42221a8534e5dd874676b51631785c}{sensor\_value\_average}};}
+\DoxyCodeLine{00034\ \ \ \ \ uint8\_t\ \mbox{\hyperlink{class_light__sensing__dimmer_a6a2e70a21ce6c92cc0211db911bf853d}{led\_value}};}
+\DoxyCodeLine{00035\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}\ \mbox{\hyperlink{class_light__sensing__dimmer_addf14cabab39edc1dd4ee22c1a55b467}{K}}\ =\ 2;\ \ \textcolor{comment}{//\ You\ can\ adjust\ this\ value\ to\ make\ the\ transition\ sharper\ or\ smoother}}
+\DoxyCodeLine{00036\ \ \ \ \ }
+\DoxyCodeLine{00037\ \ \ \ \ \mbox{\hyperlink{class_light__sensing__dimmer_a4ddb730868b0c573ab07f65795d0653f}{Light\_sensing\_dimmer}}(}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ uint8\_t\ SENSOR\_PIN\_,}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ uint8\_t\ LED\_PIN\_,}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ uint8\_t\ POLLING\_RATE\_,}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ uint8\_t\ AVERAGES\_,}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ uint8\_t\ PART\_DELAY\_,}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}\ \mbox{\hyperlink{class_light__sensing__dimmer_addf14cabab39edc1dd4ee22c1a55b467}{K}});}
+\DoxyCodeLine{00044\ \ \ \ \ \mbox{\hyperlink{class_light__sensing__dimmer_adbd9516bd8a740f14d1876622f0eb2d0}{\string~Light\_sensing\_dimmer}}();}
+\DoxyCodeLine{00045\ \};}
+\DoxyCodeLine{00046\ }
+\DoxyCodeLine{00047\ }
+\DoxyCodeLine{00048\ }
+\DoxyCodeLine{00059\ \mbox{\hyperlink{class_light__sensing__dimmer_a4ddb730868b0c573ab07f65795d0653f}{Light\_sensing\_dimmer::Light\_sensing\_dimmer}}}
+\DoxyCodeLine{00060\ (}
+\DoxyCodeLine{00061\ \ \ \ \ \textcolor{keyword}{const}\ uint8\_t\ SENSOR\_PIN\_,}
+\DoxyCodeLine{00062\ \ \ \ \ \textcolor{keyword}{const}\ uint8\_t\ LED\_PIN\_,}
+\DoxyCodeLine{00063\ \ \ \ \ \textcolor{keyword}{const}\ uint8\_t\ POLLING\_RATE\_,}
+\DoxyCodeLine{00064\ \ \ \ \ \textcolor{keyword}{const}\ uint8\_t\ AVERAGES\_,}
+\DoxyCodeLine{00065\ \ \ \ \ \textcolor{keyword}{const}\ uint8\_t\ PART\_DELAY\_,}
+\DoxyCodeLine{00066\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}\ K\_}
+\DoxyCodeLine{00067\ )\ :}
+\DoxyCodeLine{00068\ \ \ \ \ \mbox{\hyperlink{class_light__sensing__dimmer_afab340ccd81aba19e6b8d7672ad11156}{SENSOR\_PIN}}(SENSOR\_PIN\_),}
+\DoxyCodeLine{00069\ \ \ \ \ \mbox{\hyperlink{class_light__sensing__dimmer_aa5ecceb7d618987371d9b815dff2cc43}{LED\_PIN}}(LED\_PIN\_),}
+\DoxyCodeLine{00070\ \ \ \ \ \mbox{\hyperlink{class_light__sensing__dimmer_a92f9837c0642328f30bafd56fffd88e6}{POLLING\_RATE}}(POLLING\_RATE\_),}
+\DoxyCodeLine{00071\ \ \ \ \ \mbox{\hyperlink{class_light__sensing__dimmer_a2d05278089f85e41f0d5816d45bb1241}{AVERAGES}}(AVERAGES\_),}
+\DoxyCodeLine{00072\ \ \ \ \ \mbox{\hyperlink{class_light__sensing__dimmer_a364ebafb9d9f2084da3e50a8676fcdd8}{PART\_DELAY}}(PART\_DELAY\_),}
+\DoxyCodeLine{00073\ \ \ \ \ \mbox{\hyperlink{class_light__sensing__dimmer_a716b8f195ecbd8d8b553fa03cc9bbd59}{DELAY\_TIME}}(POLLING\_RATE\_\ -\/\ AVERAGES\_\ *\ PART\_DELAY\_),}
+\DoxyCodeLine{00074\ \ \ \ \ \mbox{\hyperlink{class_light__sensing__dimmer_addf14cabab39edc1dd4ee22c1a55b467}{K}}(K\_)}
+\DoxyCodeLine{00075\ \ \ \ \ \{\}}
+\DoxyCodeLine{00076\ }
+\DoxyCodeLine{00077\ \mbox{\hyperlink{class_light__sensing__dimmer_adbd9516bd8a740f14d1876622f0eb2d0}{Light\_sensing\_dimmer::\string~Light\_sensing\_dimmer}}()}
+\DoxyCodeLine{00078\ \{}
+\DoxyCodeLine{00079\ \}}
+\DoxyCodeLine{00080\ }
+\DoxyCodeLine{00081\ }
+\DoxyCodeLine{00082\ }
+\DoxyCodeLine{00091\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{_light__sensing__dimmer_8h_a24774325619ae38e49c056fa7ae9ff6a}{measureLight}}(}
+\DoxyCodeLine{00092\ \ \ \ \ uint32\_t\ \&sensor\_value\_sum,}
+\DoxyCodeLine{00093\ \ \ \ \ \textcolor{keyword}{const}\ uint8\_t\ AVERAGES,}
+\DoxyCodeLine{00094\ \ \ \ \ \textcolor{keyword}{const}\ uint8\_t\ SENSOR\_PIN,}
+\DoxyCodeLine{00095\ \ \ \ \ \textcolor{keyword}{const}\ uint8\_t\ PART\_DELAY)}
+\DoxyCodeLine{00096\ \{}
+\DoxyCodeLine{00097\ \ \ \ \ sensor\_value\_sum\ =\ 0;}
+\DoxyCodeLine{00098\ \ \ \ \ }
+\DoxyCodeLine{00099\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keywordtype}{int}\ i\ =\ 0;\ i\ <\ AVERAGES;\ i++)}
+\DoxyCodeLine{00100\ \ \ \ \ \{}
+\DoxyCodeLine{00101\ \ \ \ \ \ \ \ \ sensor\_value\_sum\ +=\ analogRead(SENSOR\_PIN);}
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \ \ delay(PART\_DELAY);}
+\DoxyCodeLine{00103\ \ \ \ \ \}}
+\DoxyCodeLine{00104\ \}}
+\DoxyCodeLine{00105\ }
+\DoxyCodeLine{00113\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{_light__sensing__dimmer_8h_a690af9ba54be3e9bad17af4993aeafca}{averageLight}}(}
+\DoxyCodeLine{00114\ \ \ \ \ uint16\_t\ \&sensor\_value\_average,}
+\DoxyCodeLine{00115\ \ \ \ \ uint32\_t\ sensor\_value\_sum,}
+\DoxyCodeLine{00116\ \ \ \ \ \textcolor{keyword}{const}\ uint8\_t\ AVERAGES)}
+\DoxyCodeLine{00117\ \{}
+\DoxyCodeLine{00118\ \ \ \ \ sensor\_value\_average\ =\ sensor\_value\_sum\ /\ AVERAGES;}
+\DoxyCodeLine{00119\ \}}
+\DoxyCodeLine{00120\ }
+\DoxyCodeLine{00128\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{_light__sensing__dimmer_8h_a51dda175a041b589f1502b412e757fef}{mapLed}}(uint8\_t\ \&led\_value,\ uint16\_t\ sensor\_value\_average,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{float}\ K)}
+\DoxyCodeLine{00129\ \{}
+\DoxyCodeLine{00130\ \ \ \ \ led\_value\ =\ 255\ *\ pow((\textcolor{keywordtype}{float})(sensor\_value\_average)\ /\ 4096,\ K);}
+\DoxyCodeLine{00131\ \}}
+\DoxyCodeLine{00132\ }
+\DoxyCodeLine{00138\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{_light__sensing__dimmer_8h_a02d9ef23f2068f5c0b948e703023ae07}{writeLed}}(uint8\_t\ led\_value)}
+\DoxyCodeLine{00139\ \{}
+\DoxyCodeLine{00140\ \ \ \ \ ledcWrite(0,\ led\_value);}
+\DoxyCodeLine{00141\ \}}
+\DoxyCodeLine{00142\ }
+\DoxyCodeLine{00149\ \textcolor{keyword}{inline}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{_light__sensing__dimmer_8h_a6f90ea55490a75eece25da7e8e0c134f}{writeSerial}}(uint8\_t\ led\_value,\ uint16\_t\ sensor\_value\_average)}
+\DoxyCodeLine{00150\ \{}
+\DoxyCodeLine{00151\ \ \ \ \ Serial.print(led\_value);}
+\DoxyCodeLine{00152\ \ \ \ \ Serial.print(\textcolor{stringliteral}{"{}\ "{}});}
+\DoxyCodeLine{00153\ \ \ \ \ Serial.print(sensor\_value\_average);}
+\DoxyCodeLine{00154\ \ \ \ \ Serial.println();}
+\DoxyCodeLine{00155\ \}}
+\DoxyCodeLine{00156\ }
+\DoxyCodeLine{00157\ }
+\DoxyCodeLine{00158\ }
+\DoxyCodeLine{00159\ }
+\DoxyCodeLine{00160\ \textcolor{preprocessor}{\#endif}}
+
+\end{DoxyCode}

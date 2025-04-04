@@ -9,5 +9,5 @@ Working well, but needs a bit tidying up.
 - to refactor the functions to take parameters, not assume global variables. DONE
 - implement class and refactored functions in main.cpp. DONE
 - make TinkerCAD simulation and drawing
-- add doxygen
+- add doxygen DONE
 - add github pages

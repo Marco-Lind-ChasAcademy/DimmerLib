@@ -1,0 +1,115 @@
+\doxysection{lib/\+Light\+\_\+sensing\+\_\+dimmer/\+Light\+\_\+sensing\+\_\+dimmer.h File Reference}
+\hypertarget{_light__sensing__dimmer_8h}{}\label{_light__sensing__dimmer_8h}\index{lib/Light\_sensing\_dimmer/Light\_sensing\_dimmer.h@{lib/Light\_sensing\_dimmer/Light\_sensing\_dimmer.h}}
+{\ttfamily \#include $<$Arduino.\+h$>$}\newline
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{class_light__sensing__dimmer}{Light\+\_\+sensing\+\_\+dimmer}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{_light__sensing__dimmer_8h_a24774325619ae38e49c056fa7ae9ff6a}{measure\+Light}} (uint32\+\_\+t \&sensor\+\_\+value\+\_\+sum, const uint8\+\_\+t AVERAGES, const uint8\+\_\+t SENSOR\+\_\+\+PIN, const uint8\+\_\+t PART\+\_\+\+DELAY)
+\begin{DoxyCompactList}\small\item\em Measure average light level. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{_light__sensing__dimmer_8h_a690af9ba54be3e9bad17af4993aeafca}{average\+Light}} (uint16\+\_\+t \&sensor\+\_\+value\+\_\+average, uint32\+\_\+t sensor\+\_\+value\+\_\+sum, const uint8\+\_\+t AVERAGES)
+\begin{DoxyCompactList}\small\item\em Calculates average light level over time. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{_light__sensing__dimmer_8h_a51dda175a041b589f1502b412e757fef}{map\+Led}} (uint8\+\_\+t \&led\+\_\+value, uint16\+\_\+t sensor\+\_\+value\+\_\+average, const float K)
+\begin{DoxyCompactList}\small\item\em Maps averaged sensor value exponentially to 8-\/bit resolution. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{_light__sensing__dimmer_8h_a02d9ef23f2068f5c0b948e703023ae07}{write\+Led}} (uint8\+\_\+t led\+\_\+value)
+\begin{DoxyCompactList}\small\item\em Writes to the LED pin. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{_light__sensing__dimmer_8h_a6f90ea55490a75eece25da7e8e0c134f}{write\+Serial}} (uint8\+\_\+t led\+\_\+value, uint16\+\_\+t sensor\+\_\+value\+\_\+average)
+\begin{DoxyCompactList}\small\item\em Writes values to the serial monitor. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{_light__sensing__dimmer_8h_a690af9ba54be3e9bad17af4993aeafca}\index{Light\_sensing\_dimmer.h@{Light\_sensing\_dimmer.h}!averageLight@{averageLight}}
+\index{averageLight@{averageLight}!Light\_sensing\_dimmer.h@{Light\_sensing\_dimmer.h}}
+\doxysubsubsection{\texorpdfstring{averageLight()}{averageLight()}}
+{\footnotesize\ttfamily \label{_light__sensing__dimmer_8h_a690af9ba54be3e9bad17af4993aeafca} 
+void average\+Light (\begin{DoxyParamCaption}\item[{uint16\+\_\+t \&}]{sensor\+\_\+value\+\_\+average}{, }\item[{uint32\+\_\+t}]{sensor\+\_\+value\+\_\+sum}{, }\item[{const uint8\+\_\+t}]{AVERAGES}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Calculates average light level over time. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em sensor\+\_\+value\+\_\+average} & Averaged light level over time \\
+\hline
+{\em sensor\+\_\+value\+\_\+sum} & Sum of the measured values \\
+\hline
+{\em AVERAGES} & Number of measuring points \\
+\hline
+\end{DoxyParams}
+\Hypertarget{_light__sensing__dimmer_8h_a51dda175a041b589f1502b412e757fef}\index{Light\_sensing\_dimmer.h@{Light\_sensing\_dimmer.h}!mapLed@{mapLed}}
+\index{mapLed@{mapLed}!Light\_sensing\_dimmer.h@{Light\_sensing\_dimmer.h}}
+\doxysubsubsection{\texorpdfstring{mapLed()}{mapLed()}}
+{\footnotesize\ttfamily \label{_light__sensing__dimmer_8h_a51dda175a041b589f1502b412e757fef} 
+void map\+Led (\begin{DoxyParamCaption}\item[{uint8\+\_\+t \&}]{led\+\_\+value}{, }\item[{uint16\+\_\+t}]{sensor\+\_\+value\+\_\+average}{, }\item[{const float}]{K}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Maps averaged sensor value exponentially to 8-\/bit resolution. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em led\+\_\+value} & LED brightness level \\
+\hline
+{\em sensor\+\_\+value\+\_\+average} & Averaged light level over time \\
+\hline
+{\em K} & Constant for the rate of change in the LED brightness \\
+\hline
+\end{DoxyParams}
+\Hypertarget{_light__sensing__dimmer_8h_a24774325619ae38e49c056fa7ae9ff6a}\index{Light\_sensing\_dimmer.h@{Light\_sensing\_dimmer.h}!measureLight@{measureLight}}
+\index{measureLight@{measureLight}!Light\_sensing\_dimmer.h@{Light\_sensing\_dimmer.h}}
+\doxysubsubsection{\texorpdfstring{measureLight()}{measureLight()}}
+{\footnotesize\ttfamily \label{_light__sensing__dimmer_8h_a24774325619ae38e49c056fa7ae9ff6a} 
+void measure\+Light (\begin{DoxyParamCaption}\item[{uint32\+\_\+t \&}]{sensor\+\_\+value\+\_\+sum}{, }\item[{const uint8\+\_\+t}]{AVERAGES}{, }\item[{const uint8\+\_\+t}]{SENSOR\+\_\+\+PIN}{, }\item[{const uint8\+\_\+t}]{PART\+\_\+\+DELAY}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Measure average light level. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em sensor\+\_\+value\+\_\+sum} & Sum of the measured values \\
+\hline
+{\em AVERAGES} & Number of measuring points \\
+\hline
+{\em SENSOR\+\_\+\+PIN} & Pin to read the light level from \\
+\hline
+{\em PART\+\_\+\+DELAY} & Delay between each measuring point \\
+\hline
+\end{DoxyParams}
+\Hypertarget{_light__sensing__dimmer_8h_a02d9ef23f2068f5c0b948e703023ae07}\index{Light\_sensing\_dimmer.h@{Light\_sensing\_dimmer.h}!writeLed@{writeLed}}
+\index{writeLed@{writeLed}!Light\_sensing\_dimmer.h@{Light\_sensing\_dimmer.h}}
+\doxysubsubsection{\texorpdfstring{writeLed()}{writeLed()}}
+{\footnotesize\ttfamily \label{_light__sensing__dimmer_8h_a02d9ef23f2068f5c0b948e703023ae07} 
+void write\+Led (\begin{DoxyParamCaption}\item[{uint8\+\_\+t}]{led\+\_\+value}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Writes to the LED pin. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em led\+\_\+value} & LED brightness level \\
+\hline
+\end{DoxyParams}
+\Hypertarget{_light__sensing__dimmer_8h_a6f90ea55490a75eece25da7e8e0c134f}\index{Light\_sensing\_dimmer.h@{Light\_sensing\_dimmer.h}!writeSerial@{writeSerial}}
+\index{writeSerial@{writeSerial}!Light\_sensing\_dimmer.h@{Light\_sensing\_dimmer.h}}
+\doxysubsubsection{\texorpdfstring{writeSerial()}{writeSerial()}}
+{\footnotesize\ttfamily \label{_light__sensing__dimmer_8h_a6f90ea55490a75eece25da7e8e0c134f} 
+void write\+Serial (\begin{DoxyParamCaption}\item[{uint8\+\_\+t}]{led\+\_\+value}{, }\item[{uint16\+\_\+t}]{sensor\+\_\+value\+\_\+average}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Writes values to the serial monitor. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em led\+\_\+value} & LED brightness level \\
+\hline
+{\em sensor\+\_\+value\+\_\+average} & Averaged light level over time \\
+\hline
+\end{DoxyParams}
