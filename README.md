@@ -26,14 +26,14 @@ To use the Light Sensing Dimmer library, include the header file in your Arduino
 Create a `Light_sensing_dimmer` object by specifying the following parameters:
 
 ```cpp
-Light_sensing_dimmer dimmer_1(A4, 3, 100, 10, 5, 2);
+Light_sensing_dimmer dimmer_1(A4, 3, 100, 20, 2500, 2);
 ```
 
 - `SENSOR_PIN` - Analog pin for light sensor input.
 - `LED_PIN` - Digital pin for dimmable LED output.
 - `POLLING_RATE` - Interval in milliseconds for LED updates.
 - `AVERAGES` - Number of sensor readings to average.
-- `PART_DELAY` - Delay in milliseconds between sensor readings.
+- `PART_DELAY` - Delay in microseconds between sensor readings.
 - `K` - Exponential scaling factor for brightness adjustment.
 
 ### Example Code
@@ -73,7 +73,7 @@ void loop()
 
 ## API Reference
 
-### `measureLight(uint32_t &sensor_value_sum, uint8_t AVERAGES, uint8_t SENSOR_PIN, uint8_t PART_DELAY)`
+### `measureLight(uint32_t &sensor_value_sum, uint8_t AVERAGES, uint8_t SENSOR_PIN, uint16_t PART_DELAY)`
 Measures ambient light and accumulates readings.
 
 ### `averageLight(uint16_t &sensor_value_average, uint32_t sensor_value_sum, uint8_t AVERAGES)`

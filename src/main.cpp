@@ -3,7 +3,7 @@
 
 
 
-Light_sensing_dimmer dimmer_1(A4, 3, 100, 10, 5, 2);
+Light_sensing_dimmer dimmer_1(A4, 3, 100, 20, 2500, 2);
 
 
 
@@ -36,6 +36,6 @@ void loop()
   writeSerial(
     dimmer_1.led_value,
     dimmer_1.sensor_value_average);
-  
+    
   delay(dimmer_1.DELAY_TIME);
 }
