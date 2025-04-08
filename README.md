@@ -1,3 +1,9 @@
+### To do:
+- Custom namespace?
+- void mapLed() -> uint8_t mapLog()?
+- delay() -> light sleep?
+- Put button vars into Light_sensing_dimmer class or it's own?
+
 # Light Sensing Dimmer Library
 
 ## Overview

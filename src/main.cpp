@@ -10,7 +10,10 @@ enum modes
 
 
 const uint8_t MODE_BUTTON_PIN = 2;
+const uint8_t POT_PIN = A1;
+
 volatile uint8_t mode = AUTO;
+uint16_t pot_value;
 
 
 
@@ -39,7 +42,9 @@ void loop()
   switch (mode)
   {
   case MANUAL:
-    ledcWrite(0, 255);
+    pot_value = analogRead(POT_PIN);
+    mapLed(dimmer_1.led_value, pot_value, dimmer_1.K);
+    ledcWrite(0, dimmer_1.led_value);
     delay(dimmer_1.POLLING_RATE);
     break;
   
