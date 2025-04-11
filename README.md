@@ -3,7 +3,12 @@
 - void mapLed() -> uint8_t mapLog()?
 - delay() -> light sleep?
 - Put button vars into Light_sensing_dimmer class or it's own: DONE
-- Make functions to simplify initialization in setup() and main()
+- Make functions to simplify initialization in setup() and main(): DONE
+- Update doxy comments for constructor and class: DONE
+- Integrate with freeRTOS to allow multithreading. mode -> dimmer_1.mode. delay() -> ?. Use tasks under the hood?
+Or maybe millis() instead...?
+- Optimizations. Alignment
+- Use a static method instead of global function for switch_mode() to allow ISR for each dimmer object
 
 # Light Sensing Dimmer Library
 
