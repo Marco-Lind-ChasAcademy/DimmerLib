@@ -5,6 +5,28 @@
 #include <Arduino.h>
 
 
+/**
+ * @brief Generates a mode switch ISR function with a custom name
+ * @param ISR_NAME Desired name for the ISR
+ * @param DIMMER_OBJECT Dimmer object to operate on
+ */
+#define MAKE_MODE_SWITCH_ISR(ISR_NAME, DIMMER_OBJECT) \
+    void ISR_NAME() \
+    { \
+        switch (DIMMER_OBJECT.mode) \
+        { \
+        case DimmerLib::MANUAL: \
+            DIMMER_OBJECT.mode = DimmerLib::AUTO; \
+            break; \
+         \
+        default: \
+            DIMMER_OBJECT.mode = DimmerLib::MANUAL; \
+            break; \
+        } \
+       \
+    }
+
+
 
 namespace DimmerLib
 {
@@ -43,7 +65,7 @@ namespace DimmerLib
         const uint8_t MODE_BUTTON_PIN;
         const uint8_t POT_PIN;
         
-        volatile uint8_t mode = DimmerLib::AUTO;
+        volatile uint8_t mode;
         uint16_t pot_value;
         uint32_t sensor_value_sum;
         uint16_t sensor_value_average;
@@ -69,7 +91,7 @@ namespace DimmerLib
             const float K_ = 2,
             const uint8_t MODE_BUTTON_PIN_ = 0,
             const uint8_t POT_PIN_ = 0,
-            volatile uint8_t mode_ = 0);
+            volatile uint8_t mode_ = DimmerLib::AUTO);
         ~Light_sensing_dimmer();
     };
     
@@ -116,13 +138,13 @@ namespace DimmerLib
     inline void writeLed(uint8_t led_value);
     inline void writeSerial(uint8_t led_value, uint16_t sensor_value_average);
     inline void setupDimmer(Light_sensing_dimmer& dimmer, uint8_t channel);
-    void runDimmer(Light_sensing_dimmer& dimmer, uint8_t mode);
+    void runDimmer(Light_sensing_dimmer& dimmer);
 
     
 
-    void runDimmer(Light_sensing_dimmer& dimmer, uint8_t mode)
+    void runDimmer(Light_sensing_dimmer& dimmer)
     {
-        switch (mode)
+        switch (dimmer.mode)
         {
         case DimmerLib::MANUAL:
           dimmer.pot_value = analogRead(dimmer.POT_PIN);
