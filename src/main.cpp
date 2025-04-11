@@ -3,7 +3,7 @@
 
 
 
-DimmerLib::Light_sensing_dimmer dimmer_1(A4, 3, 100, 20, 2500, 2, 2, A1);
+DimmerLib::Light_sensing_dimmer dimmer_1(A4, 3, 2, A1);
 
 
 

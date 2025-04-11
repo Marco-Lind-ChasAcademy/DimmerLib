@@ -44,13 +44,13 @@ namespace DimmerLib
      * 
      * @param SENSOR_PIN_ Analog pin to read the light level from
      * @param LED_PIN_ Digital pin for the dimmable LED
-     * @param POLLING_RATE_ Rate in ms at which the LED updates the light level
-     * @param AVERAGES_ Number of measuring points
-     * @param PART_DELAY_ Delay in microseconds between each measuring point
-     * @param K_ Optional: Constant for the rate of change in the LED brightness
-     * @param MODE_BUTTON_PIN_ Optional: Digital pin for mode-switching button
-     * @param POT_PIN_ Optional: Analog pin for the dimming potentiometer
+     * @param MODE_BUTTON_PIN_ Digital pin for mode-switching button
+     * @param POT_PIN_ Analog pin for the dimming potentiometer
      * @param mode_ Optional: Mode to start the dimmer in (MAN/AUTO)
+     * @param POLLING_RATE_ Optional: Rate in ms at which the LED updates the light level
+     * @param AVERAGES_ Optional: Number of measuring points
+     * @param PART_DELAY_ Optional: Delay in microseconds between each measuring point
+     * @param K_ Optional: Constant for the rate of change in the LED brightness
      */
     class Light_sensing_dimmer
     {
@@ -74,24 +74,24 @@ namespace DimmerLib
         /**
          * @param SENSOR_PIN_ Analog pin to read the light level from
          * @param LED_PIN_ Digital pin for the dimmable LED
-         * @param POLLING_RATE_ Rate in ms at which the LED updates the light level
-         * @param AVERAGES_ Number of measuring points
-         * @param PART_DELAY_ Delay in microseconds between each measuring point
-         * @param K_ Optional: Constant for the rate of change in the LED brightness
-         * @param MODE_BUTTON_PIN_ Optional: Digital pin for mode-switching button
-         * @param POT_PIN_ Optional: Analog pin for the dimming potentiometer
+         * @param MODE_BUTTON_PIN_ Digital pin for mode-switching button
+         * @param POT_PIN_ Analog pin for the dimming potentiometer
          * @param mode_ Optional: Mode to start the dimmer in (MAN/AUTO)
+         * @param POLLING_RATE_ Optional: Rate in ms at which the LED updates the light level
+         * @param AVERAGES_ Optional: Number of measuring points
+         * @param PART_DELAY_ Optional: Delay in microseconds between each measuring point
+         * @param K_ Optional: Constant for the rate of change in the LED brightness
          */
         Light_sensing_dimmer(
             const uint8_t SENSOR_PIN_,
             const uint8_t LED_PIN_,
-            const uint8_t POLLING_RATE_,
-            const uint8_t AVERAGES_,
-            const uint16_t PART_DELAY_,
-            const float K_ = 2,
-            const uint8_t MODE_BUTTON_PIN_ = 0,
-            const uint8_t POT_PIN_ = 0,
-            volatile uint8_t mode_ = DimmerLib::AUTO);
+            const uint8_t MODE_BUTTON_PIN_,
+            const uint8_t POT_PIN_,
+            volatile uint8_t mode_ = AUTO,
+            const uint8_t POLLING_RATE_ = 100,
+            const uint8_t AVERAGES_ = 20,
+            const uint16_t PART_DELAY_ = 2500,
+            const float K_ = 2);
         ~Light_sensing_dimmer();
     };
     
@@ -102,13 +102,13 @@ namespace DimmerLib
     (
         const uint8_t SENSOR_PIN_,
         const uint8_t LED_PIN_,
+        const uint8_t MODE_BUTTON_PIN_,
+        const uint8_t POT_PIN_,
+        volatile uint8_t mode_,
         const uint8_t POLLING_RATE_,
         const uint8_t AVERAGES_,
         const uint16_t PART_DELAY_,
-        const float K_,
-        const uint8_t MODE_BUTTON_PIN_,
-        const uint8_t POT_PIN_,
-        volatile uint8_t mode_
+        const float K_
     ) :
         SENSOR_PIN(SENSOR_PIN_),
         LED_PIN(LED_PIN_),
@@ -146,35 +146,35 @@ namespace DimmerLib
     {
         switch (dimmer.mode)
         {
-        case DimmerLib::MANUAL:
-          dimmer.pot_value = analogRead(dimmer.POT_PIN);
-          DimmerLib::mapLed(dimmer.led_value, dimmer.pot_value, dimmer.K);
-          ledcWrite(0, dimmer.led_value);
-          delay(dimmer.POLLING_RATE);
-          break;
+        case MANUAL:
+            dimmer.pot_value = analogRead(dimmer.POT_PIN);
+            mapLed(dimmer.led_value, dimmer.pot_value, dimmer.K);
+            ledcWrite(0, dimmer.led_value);
+            delay(dimmer.POLLING_RATE);
+            break;
         
         default:
-          DimmerLib::measureLight(
-            dimmer.sensor_value_sum,
-            dimmer.AVERAGES,
-            dimmer.SENSOR_PIN,
-            dimmer.PART_DELAY);
-          DimmerLib::averageLight(
-            dimmer.sensor_value_average,
-            dimmer.sensor_value_sum,
-            dimmer.AVERAGES);
-      
-          DimmerLib::mapLed(
-            dimmer.led_value,
-            dimmer.sensor_value_average,
-            dimmer.K);
-          DimmerLib::writeLed(dimmer.led_value);
-      
-          DimmerLib::writeSerial(
-            dimmer.led_value,
-            dimmer.sensor_value_average);
-            delay(dimmer.DELAY_TIME);
-          break;
+            measureLight(
+              dimmer.sensor_value_sum,
+              dimmer.AVERAGES,
+              dimmer.SENSOR_PIN,
+              dimmer.PART_DELAY);
+            averageLight(
+              dimmer.sensor_value_average,
+              dimmer.sensor_value_sum,
+              dimmer.AVERAGES);
+            
+            mapLed(
+              dimmer.led_value,
+              dimmer.sensor_value_average,
+              dimmer.K);
+            writeLed(dimmer.led_value);
+            
+            writeSerial(
+              dimmer.led_value,
+              dimmer.sensor_value_average);
+              delay(dimmer.DELAY_TIME);
+            break;
         }
     }
 
