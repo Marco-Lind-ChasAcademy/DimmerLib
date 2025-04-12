@@ -1,14 +1,23 @@
-#include <Light_sensing_dimmer.h>
+#include <DimmerLib.h>
+
+
+// Example with one dimmer. Uses default initializers to operate at 100 ms polling rate and anti-flicker at 50-60 Hz
+//DimmerLib::LightSensingDimmer dimmer(A4, 6, 5, A3, 0);
+
 
 
 // Example with four dimmers. Accuracy of anti-flickering is slightly lowered to have a ~100 ms total loop() and ~50 % duty cycle
-DimmerLib::Light_sensing_dimmer dimmer_1(A4, 6, 5, A3, 0, DimmerLib::AUTO, 12, 20, 625);
-DimmerLib::Light_sensing_dimmer dimmer_2(A4, 8, 7, A2, 1, DimmerLib::AUTO, 12, 20, 625);
-DimmerLib::Light_sensing_dimmer dimmer_3(A4, 10, 9, A1, 2, DimmerLib::AUTO, 12, 20, 625);
-DimmerLib::Light_sensing_dimmer dimmer_4(A4, 21, 20, A0, 3, DimmerLib::AUTO, 12, 20, 625);
+DimmerLib::LightSensingDimmer dimmer_1(A4, 6, 5, A3, 0, DimmerLib::AUTO, 2, 12, 20, 625);
+DimmerLib::LightSensingDimmer dimmer_2(A4, 8, 7, A2, 1, DimmerLib::AUTO, 2, 12, 20, 625);
+DimmerLib::LightSensingDimmer dimmer_3(A4, 10, 9, A1, 2, DimmerLib::AUTO, 2, 12, 20, 625);
+DimmerLib::LightSensingDimmer dimmer_4(A4, 21, 20, A0, 3, DimmerLib::AUTO, 2, 12, 20, 625);
+
+
 
 // Example simplified ISR macro for a single dimmer
-//MAKE_MODE_SWITCH_ISR(dimmer_1_ISR, dimmer_1)
+//MAKE_MODE_SWITCH_ISR(dimmer_ISR, dimmer)
+
+
 
 // Example custom ISR to control 4 dimmers with the same mode button
 void dimmer_ISR()
@@ -30,7 +39,6 @@ void dimmer_ISR()
   }
 
 }
-
 
 
 

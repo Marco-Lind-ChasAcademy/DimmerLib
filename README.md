@@ -8,95 +8,159 @@
 - Optimizations. Alignment
 - Put setupDimmer() into constructor instead: DONE
 
-# Light Sensing Dimmer Library
+# DimmerLib library
 
 ## Overview
-The **Light Sensing Dimmer** is an Arduino-compatible library designed for the **ESP32** microcontroller. It automatically adjusts the brightness of an LED based on ambient light levels. It follows the **inverse square law** to provide a natural perception of brightness changes and includes **anti-flickering** mechanisms to cancel out fluctuations at **50-60 Hz**. Designed for **ease of use**, this library allows seamless integration into projects requiring automatic LED dimming.
+The **DimmerLib library** is an easy to use, **Arduino-compatible** library designed for the **ESP32** microcontroller. It automatically adjusts the brightness of an LED based on ambient light levels. It follows the **inverse square law** to provide a natural perception of brightness changes and includes **anti-flickering** mechanisms to cancel out fluctuations at **50-60 Hz**. Designed for **ease of use**, this library allows seamless integration into projects requiring automatic LED dimming.
 
 ## Features
 - **Adaptive brightness**: Dynamically adjusts LED brightness based on ambient light.
 - **Inverse square law mapping**: Ensures smooth and natural transitions in brightness.
-- **Anti-flickering design**: Reduces flickering effects caused by power fluctuations at 50-60 Hz.
+- **Anti-flickering design**: Reduces flickering effects caused by power fluctuations at 50-60 Hz by default.
 - **Configurable parameters**: Allows users to customize sampling rate, delay time, and mapping curve.
 - **Serial output for debugging**: Provides real-time sensor readings and LED values.
+- **ISR macro**: Provides a standardized macro for easy ISR creation.
 - **Designed for ESP32**: Optimized for the ESP32 platform.
 - **Tested on ESP32-C3 Super Mini**: Verified to work on this specific board.
 - **Built using PlatformIO**: Developed and tested with the PlatformIO environment.
 
 ## Installation
-To use the Light Sensing Dimmer library, include the header file in your Arduino project:
+To use the DimmerLib library, include the header file in your Arduino project:
 
 ```cpp
-#include <Light_sensing_dimmer.h>
+#include <DimmerLib.h>
 ```
 
 ## Usage
 
 ### Initialization
-Create a `Light_sensing_dimmer` object by specifying the following parameters:
+Create a `LightSensingDimmer` object by specifying the following parameters:
 
 ```cpp
-Light_sensing_dimmer dimmer_1(A4, 3, 100, 20, 2500, 2);
+DimmerLib::LightSensingDimmer dimmer(A4, 6, 5, A3, 0);
 ```
 
-- `SENSOR_PIN` - Analog pin for light sensor input.
-- `LED_PIN` - Digital pin for dimmable LED output.
-- `POLLING_RATE` - Interval in milliseconds for LED updates.
-- `AVERAGES` - Number of sensor readings to average.
-- `PART_DELAY` - Delay in microseconds between sensor readings.
-- `K` - Exponential scaling factor for brightness adjustment.
+- `SENSOR_PIN_` – Analog pin for light sensor input
+- `LED_PIN_` – Digital pin for dimmable LED output
+- `MODE_BUTTON_PIN_` – Digital pin for mode-switching button
+- `POT_PIN_` – Analog pin for dimming potentiometer
+- `CHANNEL_` – PWM channel for the ESP32 (0-15)
+- `mode_` – **Optional**: Mode to start the dimmer in (MAN/AUTO)
+- `POLLING_RATE_` – **Optional**: Interval in milliseconds for LED updates
+- `AVERAGES_` – **Optional**: Number of sensor readings to average
+- `PART_DELAY_` – **Optional**: Delay in microseconds between sensor readings
+- `K_` – **Optional**: Exponential scaling factor for brightness adjustment
+
+If optional fields are left empty, the object will default to settings optimized for 50-60 Hz anti-flickering.
 
 ### Example Code
 ```cpp
+DimmerLib::LightSensingDimmer dimmer(A4, 6, 5, A3, 0);
+
+MAKE_MODE_SWITCH_ISR(dimmer_ISR, dimmer)
+
 void setup()
 {
-  ledcSetup(0, 490, 8);
-  ledcAttachPin(dimmer_1.LED_PIN, 0);
-  pinMode(dimmer_1.SENSOR_PIN, INPUT);
   Serial.begin(115200);
+
+  attachInterrupt(digitalPinToInterrupt(dimmer_1.MODE_BUTTON_PIN), dimmer_ISR, RISING);
 }
 
 void loop()
 {
-  measureLight(
-    dimmer_1.sensor_value_sum,
-    dimmer_1.AVERAGES,
-    dimmer_1.SENSOR_PIN,
-    dimmer_1.PART_DELAY);
-  
-  averageLight(
-    dimmer_1.sensor_value_average,
-    dimmer_1.sensor_value_sum,
-    dimmer_1.AVERAGES);
-
-  mapLed(
-    dimmer_1.led_value,
-    dimmer_1.sensor_value_average,
-    dimmer_1.K);
-  
-  writeLed(dimmer_1.led_value);
-  writeSerial(dimmer_1.led_value, dimmer_1.sensor_value_average);
-  
-  delay(dimmer_1.DELAY_TIME);
+  DimmerLib::runDimmer(dimmer);
 }
 ```
 
 ## API Reference
 
 ### `measureLight(uint32_t &sensor_value_sum, uint8_t AVERAGES, uint8_t SENSOR_PIN, uint16_t PART_DELAY)`
-Measures ambient light and accumulates readings.
+Measures ambient light by summing analog readings over a number of samples.
+
+- **Parameters:**
+  - `sensor_value_sum`: Reference to store the total light measurement.
+  - `AVERAGES`: Number of samples to take.
+  - `SENSOR_PIN`: Analog pin used to read the light sensor.
+  - `PART_DELAY`: Delay (in microseconds) between each sample.
+
+---
 
 ### `averageLight(uint16_t &sensor_value_average, uint32_t sensor_value_sum, uint8_t AVERAGES)`
-Calculates the average sensor value over multiple readings.
+Calculates the average sensor value over the total sum of readings.
+
+- **Parameters:**
+  - `sensor_value_average`: Reference to store the averaged result.
+  - `sensor_value_sum`: Accumulated sum of sensor readings.
+  - `AVERAGES`: Number of samples used in the sum.
+
+---
 
 ### `mapLed(uint8_t &led_value, uint16_t sensor_value_average, float K)`
-Maps sensor values to LED brightness using an exponential curve.
+Applies an exponential mapping to the averaged sensor value to determine LED brightness.
 
-### `writeLed(uint8_t led_value)`
-Writes the computed brightness level to the LED.
+- **Parameters:**
+  - `led_value`: Reference to store the calculated brightness (0–255).
+  - `sensor_value_average`: Averaged sensor value.
+  - `K`: Curve sharpness constant (higher values make the curve steeper).
+
+---
+
+### `writeLed(LightSensingDimmer &dimmer)`
+Writes the calculated brightness level to the LED using PWM.
+
+- **Parameters:**
+  - `dimmer`: Reference to the `LightSensingDimmer` instance to control.
+
+---
 
 ### `writeSerial(uint8_t led_value, uint16_t sensor_value_average)`
-Outputs LED and sensor values to the serial monitor for debugging.
+Outputs the current LED brightness and light level average to the serial monitor.
+
+- **Parameters:**
+  - `led_value`: Current brightness level.
+  - `sensor_value_average`: Current averaged light level.
+
+---
+
+### `runDimmer(LightSensingDimmer &dimmer)`
+Main control loop for the dimmer. Should be called repeatedly in `loop()`.
+
+- **Behavior:**
+  - In **AUTO** mode: Measures and averages ambient light, adjusts LED brightness accordingly.
+  - In **MANUAL** mode: Uses potentiometer value to set LED brightness.
+  - Switches mode using the provided mode-switch button.
+
+- **Parameters:**
+  - `dimmer`: Reference to a `LightSensingDimmer` object.
+
+---
+
+### `MAKE_MODE_SWITCH_ISR(ISR_NAME, DIMMER_OBJECT)`
+Macro to create a mode-switching ISR that toggles between `AUTO` and `MANUAL` modes.
+
+- **Parameters:**
+  - `ISR_NAME`: Desired name for the ISR function.
+  - `DIMMER_OBJECT`: Instance of `LightSensingDimmer` to operate on.
+
+---
+
+### `LightSensingDimmer` Constructor
+Initializes a dimmer object for controlling an LED based on ambient light or manual control.
+
+```cpp
+LightSensingDimmer(
+    uint8_t SENSOR_PIN_,
+    uint8_t LED_PIN_,
+    uint8_t MODE_BUTTON_PIN_,
+    uint8_t POT_PIN_,
+    uint8_t CHANNEL_,
+    volatile uint8_t mode_ = AUTO,
+    uint8_t POLLING_RATE_ = 100,
+    uint8_t AVERAGES_ = 20,
+    uint16_t PART_DELAY_ = 2500,
+    float K_ = 2.0
+)
+```
 
 ## Configuration
 The `K` parameter defines the curve steepness of LED brightness adjustments. A higher `K` results in more rapid brightness transitions.
