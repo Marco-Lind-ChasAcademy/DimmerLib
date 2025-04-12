@@ -129,7 +129,12 @@ namespace DimmerLib
         mode(mode_),
         last_millis(0),
         CHANNEL(CHANNEL_)
-        {}
+    {
+        ledcSetup(CHANNEL, 490, 8);
+        ledcAttachPin(LED_PIN, CHANNEL);
+        pinMode(SENSOR_PIN, INPUT);
+        pinMode(MODE_BUTTON_PIN, INPUT_PULLUP);
+    }
     
     Light_sensing_dimmer::~Light_sensing_dimmer()
     {
@@ -146,11 +151,14 @@ namespace DimmerLib
     inline void mapLed(uint8_t &led_value, uint16_t sensor_value_average, const float K);
     inline void writeLed(Light_sensing_dimmer &dimmer);
     inline void writeSerial(uint8_t led_value, uint16_t sensor_value_average);
-    inline void setupDimmer(Light_sensing_dimmer& dimmer);
     void runDimmer(Light_sensing_dimmer& dimmer);
 
     
-
+    /**
+     * @brief Runs dimmer. Put into main()
+     * 
+     * @param dimmer Dimmer object
+     */
     void runDimmer(Light_sensing_dimmer& dimmer)
     {
         dimmer.current_millis = millis();
@@ -204,14 +212,6 @@ namespace DimmerLib
         delay(1);
     }
 
-    inline void setupDimmer(Light_sensing_dimmer& dimmer)
-    {
-        ledcSetup(dimmer.CHANNEL, 490, 8);
-        ledcAttachPin(dimmer.LED_PIN, dimmer.CHANNEL);
-        pinMode(dimmer.SENSOR_PIN, INPUT);
-        pinMode(dimmer.MODE_BUTTON_PIN, INPUT_PULLUP);
-    }
-
     /**
      * @brief Measure average light level
      * 
@@ -233,7 +233,7 @@ namespace DimmerLib
             sensor_value_sum += analogRead(SENSOR_PIN);
             delayMicroseconds(PART_DELAY);
         }
-        
+
     }
     
     /**

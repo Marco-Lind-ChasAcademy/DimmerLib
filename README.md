@@ -3,9 +3,10 @@
 - Put button vars into Light_sensing_dimmer class or it's own: DONE
 - Make functions to simplify initialization in setup() and main(): DONE
 - Update doxy comments for constructor and class: DONE
-- Integrate with freeRTOS to allow multithreading. mode -> dimmer_1.mode. delay() -> ?.
+- Integrate with freeRTOS to allow multithreading. loop() -> xTaskCreate(). millis() -> delay()
+- Macro for task creation?
 - Optimizations. Alignment
-- Put setupDimmer() into constructor instead
+- Put setupDimmer() into constructor instead: DONE
 
 # Light Sensing Dimmer Library
 
