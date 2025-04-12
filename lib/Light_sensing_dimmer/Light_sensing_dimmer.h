@@ -72,8 +72,8 @@ namespace DimmerLib
         uint32_t sensor_value_sum;
         uint16_t sensor_value_average;
         uint8_t led_value;
-        uint16_t last_millis;
-        uint16_t current_millis;
+        uint32_t last_millis;
+        uint32_t current_millis;
         
         /**
          * @param SENSOR_PIN_ Analog pin to read the light level from
@@ -200,7 +200,8 @@ namespace DimmerLib
             
             break;
         }
-
+        
+        delay(1);
     }
 
     inline void setupDimmer(Light_sensing_dimmer& dimmer)
@@ -232,6 +233,7 @@ namespace DimmerLib
             sensor_value_sum += analogRead(SENSOR_PIN);
             delayMicroseconds(PART_DELAY);
         }
+        
     }
     
     /**
@@ -284,6 +286,7 @@ namespace DimmerLib
         Serial.print(sensor_value_average);
         Serial.println();
     }
+
 }
 
 

@@ -5,6 +5,7 @@
 - Update doxy comments for constructor and class: DONE
 - Integrate with freeRTOS to allow multithreading. mode -> dimmer_1.mode. delay() -> ?.
 - Optimizations. Alignment
+- Put setupDimmer() into constructor instead
 
 # Light Sensing Dimmer Library
 
