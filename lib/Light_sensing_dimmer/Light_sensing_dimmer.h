@@ -46,6 +46,7 @@ namespace DimmerLib
      * @param LED_PIN_ Digital pin for the dimmable LED
      * @param MODE_BUTTON_PIN_ Digital pin for mode-switching button
      * @param POT_PIN_ Analog pin for the dimming potentiometer
+     * @param CHANNEL_ PWM channel for the ESP32 (0-15)
      * @param mode_ Optional: Mode to start the dimmer in (MAN/AUTO)
      * @param POLLING_RATE_ Optional: Rate in ms at which the LED updates the light level
      * @param AVERAGES_ Optional: Number of measuring points
@@ -57,25 +58,29 @@ namespace DimmerLib
     public:
         const uint8_t SENSOR_PIN;
         const uint8_t LED_PIN;
-        const uint8_t POLLING_RATE;
+        const uint16_t POLLING_RATE;
         const uint8_t AVERAGES;
         const uint16_t PART_DELAY;
-        const uint8_t DELAY_TIME;
+        const uint16_t DELAY_TIME;
         const float K;  // You can adjust this value to make the transition sharper or smoother
         const uint8_t MODE_BUTTON_PIN;
         const uint8_t POT_PIN;
+        const uint8_t CHANNEL;
         
         volatile uint8_t mode;
         uint16_t pot_value;
         uint32_t sensor_value_sum;
         uint16_t sensor_value_average;
         uint8_t led_value;
+        uint16_t last_millis;
+        uint16_t current_millis;
         
         /**
          * @param SENSOR_PIN_ Analog pin to read the light level from
          * @param LED_PIN_ Digital pin for the dimmable LED
          * @param MODE_BUTTON_PIN_ Digital pin for mode-switching button
          * @param POT_PIN_ Analog pin for the dimming potentiometer
+         * @param CHANNEL_ PWM channel for the ESP32 (0-15)
          * @param mode_ Optional: Mode to start the dimmer in (MAN/AUTO)
          * @param POLLING_RATE_ Optional: Rate in ms at which the LED updates the light level
          * @param AVERAGES_ Optional: Number of measuring points
@@ -87,6 +92,7 @@ namespace DimmerLib
             const uint8_t LED_PIN_,
             const uint8_t MODE_BUTTON_PIN_,
             const uint8_t POT_PIN_,
+            const uint8_t CHANNEL_,
             volatile uint8_t mode_ = AUTO,
             const uint8_t POLLING_RATE_ = 100,
             const uint8_t AVERAGES_ = 20,
@@ -104,6 +110,7 @@ namespace DimmerLib
         const uint8_t LED_PIN_,
         const uint8_t MODE_BUTTON_PIN_,
         const uint8_t POT_PIN_,
+        const uint8_t CHANNEL_,
         volatile uint8_t mode_,
         const uint8_t POLLING_RATE_,
         const uint8_t AVERAGES_,
@@ -119,7 +126,9 @@ namespace DimmerLib
         K(K_),
         MODE_BUTTON_PIN(MODE_BUTTON_PIN_),
         POT_PIN(POT_PIN_),
-        mode(mode_)
+        mode(mode_),
+        last_millis(0),
+        CHANNEL(CHANNEL_)
         {}
     
     Light_sensing_dimmer::~Light_sensing_dimmer()
@@ -135,53 +144,69 @@ namespace DimmerLib
         const uint16_t PART_DELAY);
     inline void averageLight(uint16_t &sensor_value_average, uint32_t sensor_value_sum, const uint8_t AVERAGES);
     inline void mapLed(uint8_t &led_value, uint16_t sensor_value_average, const float K);
-    inline void writeLed(uint8_t led_value);
+    inline void writeLed(Light_sensing_dimmer &dimmer);
     inline void writeSerial(uint8_t led_value, uint16_t sensor_value_average);
-    inline void setupDimmer(Light_sensing_dimmer& dimmer, uint8_t channel);
+    inline void setupDimmer(Light_sensing_dimmer& dimmer);
     void runDimmer(Light_sensing_dimmer& dimmer);
 
     
 
     void runDimmer(Light_sensing_dimmer& dimmer)
     {
+        dimmer.current_millis = millis();
+
+
         switch (dimmer.mode)
         {
         case MANUAL:
-            dimmer.pot_value = analogRead(dimmer.POT_PIN);
-            mapLed(dimmer.led_value, dimmer.pot_value, dimmer.K);
-            ledcWrite(0, dimmer.led_value);
-            delay(dimmer.POLLING_RATE);
+            if (dimmer.current_millis - dimmer.last_millis >= dimmer.POLLING_RATE)
+            {
+                dimmer.last_millis = dimmer.current_millis;
+                
+                dimmer.pot_value = analogRead(dimmer.POT_PIN);
+                mapLed(dimmer.led_value, dimmer.pot_value, dimmer.K);
+                ledcWrite(dimmer.CHANNEL, dimmer.led_value);
+                //delay(dimmer.POLLING_RATE);
+            }
+            
             break;
         
         default:
-            measureLight(
-              dimmer.sensor_value_sum,
-              dimmer.AVERAGES,
-              dimmer.SENSOR_PIN,
-              dimmer.PART_DELAY);
-            averageLight(
-              dimmer.sensor_value_average,
-              dimmer.sensor_value_sum,
-              dimmer.AVERAGES);
+            if (dimmer.current_millis - dimmer.last_millis >= dimmer.DELAY_TIME)
+            {
+                dimmer.last_millis = dimmer.current_millis;
+
+                measureLight(
+                  dimmer.sensor_value_sum,
+                  dimmer.AVERAGES,
+                  dimmer.SENSOR_PIN,
+                  dimmer.PART_DELAY);
+                averageLight(
+                  dimmer.sensor_value_average,
+                  dimmer.sensor_value_sum,
+                  dimmer.AVERAGES);
+                
+                mapLed(
+                  dimmer.led_value,
+                  dimmer.sensor_value_average,
+                  dimmer.K);
+                writeLed(dimmer);
+                
+                writeSerial(
+                  dimmer.led_value,
+                  dimmer.sensor_value_average);
+                //delay(dimmer.DELAY_TIME);
+            }
             
-            mapLed(
-              dimmer.led_value,
-              dimmer.sensor_value_average,
-              dimmer.K);
-            writeLed(dimmer.led_value);
-            
-            writeSerial(
-              dimmer.led_value,
-              dimmer.sensor_value_average);
-              delay(dimmer.DELAY_TIME);
             break;
         }
+
     }
 
-    inline void setupDimmer(Light_sensing_dimmer& dimmer, uint8_t channel)
+    inline void setupDimmer(Light_sensing_dimmer& dimmer)
     {
-        ledcSetup(channel, 490, 8);
-        ledcAttachPin(dimmer.LED_PIN, channel);
+        ledcSetup(dimmer.CHANNEL, 490, 8);
+        ledcAttachPin(dimmer.LED_PIN, dimmer.CHANNEL);
         pinMode(dimmer.SENSOR_PIN, INPUT);
         pinMode(dimmer.MODE_BUTTON_PIN, INPUT_PULLUP);
     }
@@ -241,9 +266,9 @@ namespace DimmerLib
      * 
      * @param led_value LED brightness level
      */
-    inline void writeLed(uint8_t led_value)
+    inline void writeLed(Light_sensing_dimmer &dimmer)
     {
-        ledcWrite(0, led_value);
+        ledcWrite(dimmer.CHANNEL, dimmer.led_value);
     }
     
     /**

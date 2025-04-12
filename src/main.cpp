@@ -3,7 +3,7 @@
 
 
 
-DimmerLib::Light_sensing_dimmer dimmer_1(A4, 3, 2, A1);
+DimmerLib::Light_sensing_dimmer dimmer_1(A4, 3, 2, A1, 0);
 
 
 
@@ -15,7 +15,7 @@ void setup()
 {
   Serial.begin(115200);
 
-  DimmerLib::setupDimmer(dimmer_1, 0);
+  DimmerLib::setupDimmer(dimmer_1);
 
   attachInterrupt(digitalPinToInterrupt(dimmer_1.MODE_BUTTON_PIN), dimmer_1_ISR, RISING);
 }
