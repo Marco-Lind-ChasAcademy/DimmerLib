@@ -180,53 +180,39 @@ namespace DimmerLib
     
     void runDimmer(LightSensingDimmer& dimmer)
     {
-        dimmer.current_millis = millis();
-        
         switch (dimmer.mode)
         {
         case MANUAL:
-            if (dimmer.current_millis - dimmer.last_millis >= dimmer.POLLING_RATE)
-            {
-                dimmer.last_millis = dimmer.current_millis;
-                
-                dimmer.pot_value = analogRead(dimmer.POT_PIN);
-                mapLed(dimmer.led_value, dimmer.pot_value, dimmer.K);
-                ledcWrite(dimmer.CHANNEL, dimmer.led_value);
-                //delay(dimmer.POLLING_RATE);
-            }
+            dimmer.pot_value = analogRead(dimmer.POT_PIN); // Needs thread sync!
+            mapLed(dimmer.led_value, dimmer.pot_value, dimmer.K);
+            ledcWrite(dimmer.CHANNEL, dimmer.led_value); // Needs thread sync!
+            delay(dimmer.POLLING_RATE);
             
             break;
         
         default:
-            if (dimmer.current_millis - dimmer.last_millis >= dimmer.DELAY_TIME)
-            {
-                dimmer.last_millis = dimmer.current_millis;
-
-                measureLight(
-                  dimmer.sensor_value_sum,
-                  dimmer.AVERAGES,
-                  dimmer.SENSOR_PIN,
-                  dimmer.PART_DELAY);
-                averageLight(
-                  dimmer.sensor_value_average,
-                  dimmer.sensor_value_sum,
-                  dimmer.AVERAGES);
-                mapLed(
-                  dimmer.led_value,
-                  dimmer.sensor_value_average,
-                  dimmer.K);
-                writeLed(dimmer);
-                
-                writeSerial(
-                  dimmer.led_value,
-                  dimmer.sensor_value_average);
-                //delay(dimmer.DELAY_TIME);
-            }
+            measureLight(
+                dimmer.sensor_value_sum,
+                dimmer.AVERAGES,
+                dimmer.SENSOR_PIN,
+                dimmer.PART_DELAY); // Needs thread sync!
+            averageLight(
+                dimmer.sensor_value_average,
+                dimmer.sensor_value_sum,
+                dimmer.AVERAGES);
+            mapLed(
+                dimmer.led_value,
+                dimmer.sensor_value_average,
+                dimmer.K);
+            writeLed(dimmer); // Needs thread sync!
+            
+            writeSerial(
+                dimmer.led_value,
+                dimmer.sensor_value_average); // Maybe needs thread sync...
+            delay(dimmer.DELAY_TIME);
             
             break;
         }
-        
-        delay(1);
     }
     
     inline void measureLight(uint32_t &sensor_value_sum, const uint8_t AVERAGES, const uint8_t SENSOR_PIN, const uint16_t PART_DELAY)

@@ -1,12 +1,13 @@
 ### To do:
+- Optimizations. Alignment
 - Custom namespace: DONE
 - Put button vars into Light_sensing_dimmer class or it's own: DONE
 - Make functions to simplify initialization in setup() and main(): DONE
 - Update doxy comments for constructor and class: DONE
-- Integrate with freeRTOS to allow multithreading. loop() -> xTaskCreate(). millis() -> delay()
-- Macro for task creation?
-- Optimizations. Alignment
+- Integrate with freeRTOS to allow multithreading. loop() -> xTaskCreate(). millis() -> delay(): DONE
 - Put setupDimmer() into constructor instead: DONE
+- Put task creation function into header
+- Implement thread sync mechanisms where needed. Binary semasphores
 
 # DimmerLib library
 
