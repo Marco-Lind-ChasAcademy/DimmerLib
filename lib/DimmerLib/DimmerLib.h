@@ -3,6 +3,7 @@
 
 
 #include <Arduino.h>
+//#include <freertos/FreeRTOS.h>
 
 /**
  * @brief Macro to create a mode-switching ISR that toggles between AUTO and MANUAL modes.
@@ -57,8 +58,6 @@ namespace DimmerLib
         uint32_t sensor_value_sum;
         uint16_t sensor_value_average;
         uint8_t led_value;
-        uint32_t last_millis;
-        uint32_t current_millis;
 
         /**
          * @brief Constructor to initialize a LightSensingDimmer object.
@@ -111,7 +110,7 @@ namespace DimmerLib
         PART_DELAY(PART_DELAY_), POT_PIN(POT_PIN_),
         DELAY_TIME(POLLING_RATE_ - (AVERAGES_ * PART_DELAY_) / 1000),
         K(K_), MODE_BUTTON_PIN(MODE_BUTTON_PIN_),
-        mode(mode_), last_millis(0), CHANNEL(CHANNEL_)
+        mode(mode_), CHANNEL(CHANNEL_)
     {
         ledcSetup(CHANNEL, 490, 8);
         ledcAttachPin(LED_PIN, CHANNEL);
@@ -122,6 +121,25 @@ namespace DimmerLib
     LightSensingDimmer::~LightSensingDimmer()
     {
     }
+
+
+
+    SemaphoreHandle_t semaphore_A0 = xSemaphoreCreateBinary();
+    SemaphoreHandle_t semaphore_A1 = xSemaphoreCreateBinary();
+    SemaphoreHandle_t semaphore_A2 = xSemaphoreCreateBinary();
+    SemaphoreHandle_t semaphore_A3 = xSemaphoreCreateBinary();
+    SemaphoreHandle_t semaphore_A4 = xSemaphoreCreateBinary();
+    SemaphoreHandle_t semaphore_5 = xSemaphoreCreateBinary();
+    SemaphoreHandle_t semaphore_6 = xSemaphoreCreateBinary();
+    SemaphoreHandle_t semaphore_7 = xSemaphoreCreateBinary();
+    SemaphoreHandle_t semaphore_8 = xSemaphoreCreateBinary();
+    SemaphoreHandle_t semaphore_9 = xSemaphoreCreateBinary();
+    SemaphoreHandle_t semaphore_10 = xSemaphoreCreateBinary();
+    SemaphoreHandle_t semaphore_20 = xSemaphoreCreateBinary();
+    SemaphoreHandle_t semaphore_21 = xSemaphoreCreateBinary();
+    SemaphoreHandle_t semaphore_serial = xSemaphoreCreateBinary();
+
+
 
     /**
      * @brief Measures ambient light by summing analog readings over multiple samples.
@@ -176,26 +194,575 @@ namespace DimmerLib
      */
     void runDimmer(LightSensingDimmer& dimmer);
 
+    /**
+     * @brief FreeRTOS task for runDimmer()
+     * 
+     * @param pvParameter pvParameter for xTaskCreate()
+     */
+    void runDimmerTask(void *pvParameter);
 
+    /**
+     * @brief Reads potentiometer in thread-safe manner
+     * 
+     * @param dimmer Dimmer object reference
+     */
+    void readPotSafe(LightSensingDimmer &dimmer);
+
+    /**
+     * @brief Writes to LED in thread-safe manner
+     * 
+     * @param dimmer Dimmer object reference
+     */
+    void writeLedSafe(LightSensingDimmer &dimmer);
+
+    /**
+     * @brief Measures light level in thread-safe manner
+     * 
+     * @param dimmer Dimmer object reference
+     */
+    void measureLightSafe(LightSensingDimmer &dimmer);
+
+    /**
+     * @brief Writes serial output in thread-safe manner
+     * 
+     * @param dimmer Dimmer object reference
+     */
+    void writeSerialSafe(LightSensingDimmer &dimmer);
+
+    /**
+     * @brief Give semasphores once
+     * 
+     */
+    void semInit();
+
+
+
+    void semInit()
+    {
+        xSemaphoreGive(semaphore_A0);
+        xSemaphoreGive(semaphore_A1);
+        xSemaphoreGive(semaphore_A2);
+        xSemaphoreGive(semaphore_A3);
+        xSemaphoreGive(semaphore_A4);
+        xSemaphoreGive(semaphore_5);
+        xSemaphoreGive(semaphore_6);
+        xSemaphoreGive(semaphore_7);
+        xSemaphoreGive(semaphore_8);
+        xSemaphoreGive(semaphore_9);
+        xSemaphoreGive(semaphore_10);
+        xSemaphoreGive(semaphore_20);
+        xSemaphoreGive(semaphore_21);
+        xSemaphoreGive(semaphore_serial);
+    }
+
+    void writeSerialSafe(LightSensingDimmer &dimmer)
+    {
+        if (xSemaphoreTake(semaphore_serial, portMAX_DELAY) == pdTRUE)
+        {
+            writeSerial(
+                dimmer.led_value,
+                dimmer.sensor_value_average);
+
+            xSemaphoreGive(semaphore_serial);
+        }
+    }
+
+    void measureLightSafe(LightSensingDimmer &dimmer)
+    {
+        switch (dimmer.SENSOR_PIN)
+        {
+        case A0:
+            if (xSemaphoreTake(semaphore_A0, portMAX_DELAY) == pdTRUE)
+            {
+                measureLight(
+                    dimmer.sensor_value_sum,
+                    dimmer.AVERAGES,
+                    dimmer.SENSOR_PIN,
+                    dimmer.PART_DELAY);
+
+                xSemaphoreGive(semaphore_A0);
+            }
+            
+            break;
+
+        case A1:
+            if (xSemaphoreTake(semaphore_A1, portMAX_DELAY) == pdTRUE)
+            {
+                measureLight(
+                    dimmer.sensor_value_sum,
+                    dimmer.AVERAGES,
+                    dimmer.SENSOR_PIN,
+                    dimmer.PART_DELAY);
+
+                xSemaphoreGive(semaphore_A1);
+            }
+            
+            break;
+
+        case A2:
+            if (xSemaphoreTake(semaphore_A2, portMAX_DELAY) == pdTRUE)
+            {
+                measureLight(
+                    dimmer.sensor_value_sum,
+                    dimmer.AVERAGES,
+                    dimmer.SENSOR_PIN,
+                    dimmer.PART_DELAY);
     
+                xSemaphoreGive(semaphore_A2);
+            }
+            
+            break;
+
+        case A3:
+            if (xSemaphoreTake(semaphore_A3, portMAX_DELAY) == pdTRUE)
+            {
+                measureLight(
+                    dimmer.sensor_value_sum,
+                    dimmer.AVERAGES,
+                    dimmer.SENSOR_PIN,
+                    dimmer.PART_DELAY);
+    
+                xSemaphoreGive(semaphore_A3);
+            }
+            
+            break;
+
+        case A4:
+            if (xSemaphoreTake(semaphore_A4, portMAX_DELAY) == pdTRUE)
+            {
+                measureLight(
+                    dimmer.sensor_value_sum,
+                    dimmer.AVERAGES,
+                    dimmer.SENSOR_PIN,
+                    dimmer.PART_DELAY);
+    
+                xSemaphoreGive(semaphore_A4);
+            }
+            
+            break;
+
+        case 5:
+            if (xSemaphoreTake(semaphore_5, portMAX_DELAY) == pdTRUE)
+            {
+                measureLight(
+                    dimmer.sensor_value_sum,
+                    dimmer.AVERAGES,
+                    dimmer.SENSOR_PIN,
+                    dimmer.PART_DELAY);
+    
+                xSemaphoreGive(semaphore_5);
+            }
+            
+            break;
+
+        case 6:
+            if (xSemaphoreTake(semaphore_6, portMAX_DELAY) == pdTRUE)
+            {
+                measureLight(
+                    dimmer.sensor_value_sum,
+                    dimmer.AVERAGES,
+                    dimmer.SENSOR_PIN,
+                    dimmer.PART_DELAY);
+    
+                xSemaphoreGive(semaphore_6);
+            }
+            
+            break;
+
+        case 7:
+            if (xSemaphoreTake(semaphore_7, portMAX_DELAY) == pdTRUE)
+            {
+                measureLight(
+                    dimmer.sensor_value_sum,
+                    dimmer.AVERAGES,
+                    dimmer.SENSOR_PIN,
+                    dimmer.PART_DELAY);
+    
+                xSemaphoreGive(semaphore_7);
+            }
+            
+            break;
+
+        case 8:
+            if (xSemaphoreTake(semaphore_8, portMAX_DELAY) == pdTRUE)
+            {
+                measureLight(
+                    dimmer.sensor_value_sum,
+                    dimmer.AVERAGES,
+                    dimmer.SENSOR_PIN,
+                    dimmer.PART_DELAY);
+    
+                xSemaphoreGive(semaphore_8);
+            }
+            
+            break;
+
+        case 9:
+            if (xSemaphoreTake(semaphore_9, portMAX_DELAY) == pdTRUE)
+            {
+                measureLight(
+                    dimmer.sensor_value_sum,
+                    dimmer.AVERAGES,
+                    dimmer.SENSOR_PIN,
+                    dimmer.PART_DELAY);
+    
+                xSemaphoreGive(semaphore_9);
+            }
+            
+            break;
+
+        case 10:
+            if (xSemaphoreTake(semaphore_10, portMAX_DELAY) == pdTRUE)
+            {
+                measureLight(
+                    dimmer.sensor_value_sum,
+                    dimmer.AVERAGES,
+                    dimmer.SENSOR_PIN,
+                    dimmer.PART_DELAY);
+    
+                xSemaphoreGive(semaphore_10);
+            }
+            
+            break;
+
+        case 20:
+            if (xSemaphoreTake(semaphore_20, portMAX_DELAY) == pdTRUE)
+            {
+                measureLight(
+                    dimmer.sensor_value_sum,
+                    dimmer.AVERAGES,
+                    dimmer.SENSOR_PIN,
+                    dimmer.PART_DELAY);
+    
+                xSemaphoreGive(semaphore_20);
+            }
+            
+            break;
+
+        case 21:
+            if (xSemaphoreTake(semaphore_21, portMAX_DELAY) == pdTRUE)
+            {
+                measureLight(
+                    dimmer.sensor_value_sum,
+                    dimmer.AVERAGES,
+                    dimmer.SENSOR_PIN,
+                    dimmer.PART_DELAY);
+    
+                xSemaphoreGive(semaphore_21);
+            }
+            
+            break;
+            
+        default:
+            break;
+        }
+    }
+
+    void writeLedSafe(LightSensingDimmer &dimmer)
+    {
+        switch (dimmer.LED_PIN)
+        {
+        case A0:
+            if (xSemaphoreTake(semaphore_A0, portMAX_DELAY) == pdTRUE)
+            {
+                ledcWrite(dimmer.CHANNEL, dimmer.led_value);
+
+                xSemaphoreGive(semaphore_A0);
+            }
+            
+            break;
+
+        case A1:
+            if (xSemaphoreTake(semaphore_A1, portMAX_DELAY) == pdTRUE)
+            {
+                ledcWrite(dimmer.CHANNEL, dimmer.led_value);
+
+                xSemaphoreGive(semaphore_A1);
+            }
+            
+            break;
+
+        case A2:
+            if (xSemaphoreTake(semaphore_A2, portMAX_DELAY) == pdTRUE)
+            {
+                ledcWrite(dimmer.CHANNEL, dimmer.led_value);
+    
+                xSemaphoreGive(semaphore_A2);
+            }
+            
+            break;
+
+        case A3:
+            if (xSemaphoreTake(semaphore_A3, portMAX_DELAY) == pdTRUE)
+            {
+                ledcWrite(dimmer.CHANNEL, dimmer.led_value);
+    
+                xSemaphoreGive(semaphore_A3);
+            }
+            
+            break;
+
+        case A4:
+            if (xSemaphoreTake(semaphore_A4, portMAX_DELAY) == pdTRUE)
+            {
+                ledcWrite(dimmer.CHANNEL, dimmer.led_value);
+    
+                xSemaphoreGive(semaphore_A4);
+            }
+            
+            break;
+
+        case 5:
+            if (xSemaphoreTake(semaphore_5, portMAX_DELAY) == pdTRUE)
+            {
+                ledcWrite(dimmer.CHANNEL, dimmer.led_value);
+    
+                xSemaphoreGive(semaphore_5);
+            }
+            
+            break;
+
+        case 6:
+            if (xSemaphoreTake(semaphore_6, portMAX_DELAY) == pdTRUE)
+            {
+                ledcWrite(dimmer.CHANNEL, dimmer.led_value);
+    
+                xSemaphoreGive(semaphore_6);
+            }
+            
+            break;
+
+        case 7:
+            if (xSemaphoreTake(semaphore_7, portMAX_DELAY) == pdTRUE)
+            {
+                ledcWrite(dimmer.CHANNEL, dimmer.led_value);
+    
+                xSemaphoreGive(semaphore_7);
+            }
+            
+            break;
+
+        case 8:
+            if (xSemaphoreTake(semaphore_8, portMAX_DELAY) == pdTRUE)
+            {
+                ledcWrite(dimmer.CHANNEL, dimmer.led_value);
+    
+                xSemaphoreGive(semaphore_8);
+            }
+            
+            break;
+
+        case 9:
+            if (xSemaphoreTake(semaphore_9, portMAX_DELAY) == pdTRUE)
+            {
+                ledcWrite(dimmer.CHANNEL, dimmer.led_value);
+    
+                xSemaphoreGive(semaphore_9);
+            }
+            
+            break;
+
+        case 10:
+            if (xSemaphoreTake(semaphore_10, portMAX_DELAY) == pdTRUE)
+            {
+                ledcWrite(dimmer.CHANNEL, dimmer.led_value);
+    
+                xSemaphoreGive(semaphore_10);
+            }
+            
+            break;
+
+        case 20:
+            if (xSemaphoreTake(semaphore_20, portMAX_DELAY) == pdTRUE)
+            {
+                ledcWrite(dimmer.CHANNEL, dimmer.led_value);
+    
+                xSemaphoreGive(semaphore_20);
+            }
+            
+            break;
+
+        case 21:
+            if (xSemaphoreTake(semaphore_21, portMAX_DELAY) == pdTRUE)
+            {
+                ledcWrite(dimmer.CHANNEL, dimmer.led_value);
+    
+                xSemaphoreGive(semaphore_21);
+            }
+            
+            break;
+            
+        default:
+            break;
+        }
+    }
+
+    void readPotSafe(LightSensingDimmer &dimmer)
+    {
+        switch (dimmer.POT_PIN)
+        {
+        case A0:
+            if (xSemaphoreTake(semaphore_A0, portMAX_DELAY) == pdTRUE)
+            {
+                dimmer.pot_value = analogRead(dimmer.POT_PIN);
+
+                xSemaphoreGive(semaphore_A0);
+            }
+            
+            break;
+
+        case A1:
+            if (xSemaphoreTake(semaphore_A1, portMAX_DELAY) == pdTRUE)
+            {
+                dimmer.pot_value = analogRead(dimmer.POT_PIN);
+
+                xSemaphoreGive(semaphore_A1);
+            }
+            
+            break;
+
+        case A2:
+            if (xSemaphoreTake(semaphore_A2, portMAX_DELAY) == pdTRUE)
+            {
+                dimmer.pot_value = analogRead(dimmer.POT_PIN);
+    
+                xSemaphoreGive(semaphore_A2);
+            }
+            
+            break;
+
+        case A3:
+            if (xSemaphoreTake(semaphore_A3, portMAX_DELAY) == pdTRUE)
+            {
+                dimmer.pot_value = analogRead(dimmer.POT_PIN);
+    
+                xSemaphoreGive(semaphore_A3);
+            }
+            
+            break;
+
+        case A4:
+            if (xSemaphoreTake(semaphore_A4, portMAX_DELAY) == pdTRUE)
+            {
+                dimmer.pot_value = analogRead(dimmer.POT_PIN);
+    
+                xSemaphoreGive(semaphore_A4);
+            }
+            
+            break;
+
+        case 5:
+            if (xSemaphoreTake(semaphore_5, portMAX_DELAY) == pdTRUE)
+            {
+                dimmer.pot_value = analogRead(dimmer.POT_PIN);
+    
+                xSemaphoreGive(semaphore_5);
+            }
+            
+            break;
+
+        case 6:
+            if (xSemaphoreTake(semaphore_6, portMAX_DELAY) == pdTRUE)
+            {
+                dimmer.pot_value = analogRead(dimmer.POT_PIN);
+    
+                xSemaphoreGive(semaphore_6);
+            }
+            
+            break;
+
+        case 7:
+            if (xSemaphoreTake(semaphore_7, portMAX_DELAY) == pdTRUE)
+            {
+                dimmer.pot_value = analogRead(dimmer.POT_PIN);
+    
+                xSemaphoreGive(semaphore_7);
+            }
+            
+            break;
+
+        case 8:
+            if (xSemaphoreTake(semaphore_8, portMAX_DELAY) == pdTRUE)
+            {
+                dimmer.pot_value = analogRead(dimmer.POT_PIN);
+    
+                xSemaphoreGive(semaphore_8);
+            }
+            
+            break;
+
+        case 9:
+            if (xSemaphoreTake(semaphore_9, portMAX_DELAY) == pdTRUE)
+            {
+                dimmer.pot_value = analogRead(dimmer.POT_PIN);
+    
+                xSemaphoreGive(semaphore_9);
+            }
+            
+            break;
+
+        case 10:
+            if (xSemaphoreTake(semaphore_10, portMAX_DELAY) == pdTRUE)
+            {
+                dimmer.pot_value = analogRead(dimmer.POT_PIN);
+    
+                xSemaphoreGive(semaphore_10);
+            }
+            
+            break;
+
+        case 20:
+            if (xSemaphoreTake(semaphore_20, portMAX_DELAY) == pdTRUE)
+            {
+                dimmer.pot_value = analogRead(dimmer.POT_PIN);
+    
+                xSemaphoreGive(semaphore_20);
+            }
+            
+            break;
+
+        case 21:
+            if (xSemaphoreTake(semaphore_21, portMAX_DELAY) == pdTRUE)
+            {
+                dimmer.pot_value = analogRead(dimmer.POT_PIN);
+    
+                xSemaphoreGive(semaphore_21);
+            }
+            
+            break;
+            
+        default:
+            break;
+        }
+    }
+
+    void runDimmerTask(void *pvParameter)
+    {
+      DimmerLib::LightSensingDimmer *dimmer_1 = (DimmerLib::LightSensingDimmer *)pvParameter;
+    
+      while (1)
+      {
+        DimmerLib::runDimmer(*dimmer_1);
+      }
+      
+    }
+
     void runDimmer(LightSensingDimmer& dimmer)
     {
         switch (dimmer.mode)
         {
         case MANUAL:
-            dimmer.pot_value = analogRead(dimmer.POT_PIN); // Needs thread sync!
+            readPotSafe(dimmer);
             mapLed(dimmer.led_value, dimmer.pot_value, dimmer.K);
-            ledcWrite(dimmer.CHANNEL, dimmer.led_value); // Needs thread sync!
+            writeLedSafe(dimmer);
+
             delay(dimmer.POLLING_RATE);
             
             break;
         
         default:
-            measureLight(
-                dimmer.sensor_value_sum,
-                dimmer.AVERAGES,
-                dimmer.SENSOR_PIN,
-                dimmer.PART_DELAY); // Needs thread sync!
+            measureLightSafe(dimmer);
+            
             averageLight(
                 dimmer.sensor_value_average,
                 dimmer.sensor_value_sum,
@@ -204,11 +771,8 @@ namespace DimmerLib
                 dimmer.led_value,
                 dimmer.sensor_value_average,
                 dimmer.K);
-            writeLed(dimmer); // Needs thread sync!
-            
-            writeSerial(
-                dimmer.led_value,
-                dimmer.sensor_value_average); // Maybe needs thread sync...
+            writeLedSafe(dimmer);
+            writeSerialSafe(dimmer);
             delay(dimmer.DELAY_TIME);
             
             break;
