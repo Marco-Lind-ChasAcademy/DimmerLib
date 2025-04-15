@@ -9,7 +9,7 @@
 - Put task creation function into header: DONE
 - Implement thread sync mechanisms where needed. Binary semasphores: DONE
 - Clean up switch statements. Maybe some other way? Lookup tables?
-- Test conflicting pins to ensure thread safety
+- Test conflicting pins to ensure thread safety: DONE
 
 # DimmerLib library
 
@@ -43,16 +43,16 @@ Create a `LightSensingDimmer` object by specifying the following parameters:
 DimmerLib::LightSensingDimmer dimmer(A4, 6, 5, A3, 0);
 ```
 
-- `SENSOR_PIN_` – Analog pin for light sensor input
-- `LED_PIN_` – Digital pin for dimmable LED output
-- `MODE_BUTTON_PIN_` – Digital pin for mode-switching button
-- `POT_PIN_` – Analog pin for dimming potentiometer
-- `CHANNEL_` – PWM channel for the ESP32 (0-15)
-- `mode_` – **Optional**: Mode to start the dimmer in (MAN/AUTO)
-- `POLLING_RATE_` – **Optional**: Interval in milliseconds for LED updates
-- `AVERAGES_` – **Optional**: Number of sensor readings to average
-- `PART_DELAY_` – **Optional**: Delay in microseconds between sensor readings
-- `K_` – **Optional**: Exponential scaling factor for brightness adjustment
+- `SENSOR_PIN_` – Analog pin to read light levels.
+- `LED_PIN_` – PWM-capable pin connected to the LED.
+- `MODE_BUTTON_PIN_` – Digital pin connected to mode toggle button (INPUT_PULLUP).
+- `POT_PIN_` – Analog pin connected to potentiometer for manual dimming.
+- `CHANNEL_` – PWM channel (0–15 on ESP32).
+- `mode_` – **Optional**: Starting mode (AUTO or MANUAL).
+- `K_` – **Optional**: Exponential scaling factor for brightness mapping.
+- `POLLING_RATE_` – **Optional**: Update rate in ms.
+- `AVERAGES_` – **Optional**: Number of light samples to average.
+- `PART_DELAY_` – **Optional**: Microsecond delay between samples.
 
 If optional fields are left empty, the object will default to settings optimized for 50-60 Hz anti-flickering.
 
@@ -65,6 +65,8 @@ MAKE_MODE_SWITCH_ISR(dimmer_ISR, dimmer)
 void setup()
 {
   Serial.begin(115200);
+
+  DimmerLib::semInit();
 
   attachInterrupt(digitalPinToInterrupt(dimmer_1.MODE_BUTTON_PIN), dimmer_ISR, RISING);
 }

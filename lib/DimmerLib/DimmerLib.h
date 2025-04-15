@@ -66,7 +66,7 @@ namespace DimmerLib
          * 
          * @param SENSOR_PIN_ Analog pin to read light levels.
          * @param LED_PIN_ PWM-capable pin connected to the LED.
-         * @param MODE_BUTTON_PIN_ Pin connected to mode toggle button (INPUT_PULLUP).
+         * @param MODE_BUTTON_PIN_ Digital pin connected to mode toggle button (INPUT_PULLUP).
          * @param POT_PIN_ Analog pin connected to potentiometer for manual dimming.
          * @param CHANNEL_ PWM channel (0–15 on ESP32).
          * @param mode_ Optional: Starting mode (AUTO or MANUAL).
