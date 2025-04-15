@@ -1,3 +1,16 @@
+### To do:
+- Optimizations. Alignment
+- Custom namespace: DONE
+- Put button vars into Light_sensing_dimmer class or it's own: DONE
+- Make functions to simplify initialization in setup() and main(): DONE
+- Update doxy comments for constructor and class: DONE
+- Integrate with FreeRTOS to allow multithreading. loop() -> xTaskCreate(). millis() -> delay(): DONE
+- Put setupDimmer() into constructor instead: DONE
+- Put task creation function into header: DONE
+- Implement thread sync mechanisms where needed. Binary semasphores: DONE
+- Clean up switch statements. Maybe some other way? Lookup tables?
+- Test conflicting pins to ensure thread safety: DONE
+
 # DimmerLib library
 
 ## Overview
@@ -124,6 +137,39 @@ Main control loop for the dimmer. Should be called repeatedly in `loop()`.
 
 - **Parameters:**
   - `dimmer`: Reference to a `LightSensingDimmer` object.
+
+---
+
+### `void runDimmerTask(void *pvParameter)`
+FreeRTOS task for `runDimmer()`.
+
+- **Behavior:**
+  - Runs a `runDimmer()`-based task
+
+- **Parameters:**
+  - `pvParameter`: for `xTaskCreate()`.
+
+---
+
+### `void writeSerialSafe(uint8_t led_value, uint16_t sensor_value_average)`
+Writes serial output in thread-safe manner.
+
+- **Behavior:**
+  - Runs a `runDimmer()`-based task
+
+- **Parameters:**
+  - `led_value`: Dimmer object LED output value.
+  - `sensor_value_average`: Dimmer object average sensor value.
+
+---
+
+### `void semInit()`
+Initializes semaphores.
+
+- **Behavior:**
+  - Runs xSemaphoreGive() for the Serial semaphore
+
+- **Parameters:**
 
 ---
 
