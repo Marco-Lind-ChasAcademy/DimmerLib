@@ -8,7 +8,7 @@ DimmerLib::LightSensingDimmer dimmer_3(A4, 10, 9, A1, 2);
 DimmerLib::LightSensingDimmer dimmer_4(A4, 21, 20, A0, 3);
 
 
-// Example with an ISR for dimmer_1
+// Example with an ISR:s for all the dimmers
 MAKE_MODE_SWITCH_ISR(dimmer_1_ISR, dimmer_1)
 MAKE_MODE_SWITCH_ISR(dimmer_2_ISR, dimmer_2)
 MAKE_MODE_SWITCH_ISR(dimmer_3_ISR, dimmer_3)
