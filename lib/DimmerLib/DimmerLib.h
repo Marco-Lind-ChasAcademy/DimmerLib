@@ -269,12 +269,12 @@ namespace DimmerLib
 
     void runDimmerTask(void *pvParameter)
     {
-      DimmerLib::LightSensingDimmer *dimmer_1 = (DimmerLib::LightSensingDimmer *)pvParameter;
-    
-      while (1)
-      {
-        DimmerLib::runDimmer(*dimmer_1);
-      }
+        DimmerLib::LightSensingDimmer *dimmer_1 = (DimmerLib::LightSensingDimmer *)pvParameter;
+        
+        while (1)
+        {
+            DimmerLib::runDimmer(*dimmer_1);
+        }
       
     }
 

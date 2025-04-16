@@ -39,13 +39,13 @@ void setup()
   attachInterrupt(digitalPinToInterrupt(dimmer_2.DEBUG_BUTTON_PIN), dimmer_2_debug_ISR, RISING);
   attachInterrupt(digitalPinToInterrupt(dimmer_3.DEBUG_BUTTON_PIN), dimmer_3_debug_ISR, RISING);
 
-  xTaskCreate(DimmerLib::runDimmerTask, "Dimmer 0", 4096, &dimmer_0, configMAX_PRIORITIES - 1, NULL);
-  vTaskDelay(2);
-  xTaskCreate(DimmerLib::runDimmerTask, "Dimmer 1", 4096, &dimmer_1, configMAX_PRIORITIES - 1, NULL);
-  vTaskDelay(2);
-  xTaskCreate(DimmerLib::runDimmerTask, "Dimmer 2", 4096, &dimmer_2, configMAX_PRIORITIES - 1, NULL);
-  vTaskDelay(2);
-  xTaskCreate(DimmerLib::runDimmerTask, "Dimmer 3", 4096, &dimmer_3, configMAX_PRIORITIES - 1, NULL);
+  xTaskCreate(DimmerLib::runDimmerTask, "Dimmer 0", 1024, &dimmer_0, configMAX_PRIORITIES - 1, NULL);
+  vTaskDelay(DimmerLib::dimmer_id - 1);
+  xTaskCreate(DimmerLib::runDimmerTask, "Dimmer 1", 1024, &dimmer_1, configMAX_PRIORITIES - 1, NULL);
+  vTaskDelay(DimmerLib::dimmer_id - 1);
+  xTaskCreate(DimmerLib::runDimmerTask, "Dimmer 2", 1024, &dimmer_2, configMAX_PRIORITIES - 1, NULL);
+  vTaskDelay(DimmerLib::dimmer_id - 1);
+  xTaskCreate(DimmerLib::runDimmerTask, "Dimmer 3", 1024, &dimmer_3, configMAX_PRIORITIES - 1, NULL);
 }
 
 void loop()
