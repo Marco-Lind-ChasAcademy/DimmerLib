@@ -14,15 +14,22 @@
 #define MAKE_MODE_SWITCH_ISR(ISR_NAME, DIMMER_OBJECT) \
     void ISR_NAME() \
     { \
-        switch (DIMMER_OBJECT.mode) \
+        DimmerLib::current_time_ms = millis(); \
+        \
+        if (DimmerLib::current_time_ms - DimmerLib::last_button_press_time_ms > 200) \
         { \
-        case DimmerLib::MANUAL: \
-            DIMMER_OBJECT.mode = DimmerLib::AUTO; \
-            break; \
-         \
-        default: \
-            DIMMER_OBJECT.mode = DimmerLib::MANUAL; \
-            break; \
+            DimmerLib::last_button_press_time_ms = DimmerLib::current_time_ms; \
+             \
+            switch (DIMMER_OBJECT.mode) \
+            { \
+            case DimmerLib::MANUAL: \
+                DIMMER_OBJECT.mode = DimmerLib::AUTO; \
+                break; \
+             \
+            default: \
+                DIMMER_OBJECT.mode = DimmerLib::MANUAL; \
+                break; \
+            } \
         } \
        \
     }
@@ -128,6 +135,9 @@ namespace DimmerLib
 
 
     SemaphoreHandle_t semaphore_serial = xSemaphoreCreateBinary();
+    
+    uint32_t last_button_press_time_ms = 0;
+    uint32_t current_time_ms;
 
 
 
