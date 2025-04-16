@@ -3,7 +3,6 @@
 
 
 #include <Arduino.h>
-//#include <freertos/FreeRTOS.h>
 
 /**
  * @brief Macro to create a mode-switching ISR that toggles between AUTO and MANUAL modes.
@@ -12,22 +11,51 @@
  * @param DIMMER_OBJECT Instance of LightSensingDimmer to operate on.
  */
 #define MAKE_MODE_SWITCH_ISR(ISR_NAME, DIMMER_OBJECT) \
+void ISR_NAME() \
+{ \
+    DimmerLib::current_time_ms = millis(); \
+    \
+    if (DimmerLib::current_time_ms - DimmerLib::last_mode_button_press_ms > 200) \
+    { \
+        DimmerLib::last_mode_button_press_ms = DimmerLib::current_time_ms; \
+         \
+        switch (DIMMER_OBJECT.mode) \
+        { \
+        case DimmerLib::MANUAL: \
+            DIMMER_OBJECT.mode = DimmerLib::AUTO; \
+            break; \
+         \
+        default: \
+            DIMMER_OBJECT.mode = DimmerLib::MANUAL; \
+            break; \
+        } \
+    } \
+   \
+}
+
+/**
+ * @brief Macro to create a debug ISR that toggles switches serial prints on or off.
+ * 
+ * @param ISR_NAME Desired name for the ISR function.
+ * @param DIMMER_OBJECT Instance of LightSensingDimmer to operate on.
+ */
+#define MAKE_DEBUG_SWITCH_ISR(ISR_NAME, DIMMER_OBJECT) \
     void ISR_NAME() \
     { \
         DimmerLib::current_time_ms = millis(); \
         \
-        if (DimmerLib::current_time_ms - DimmerLib::last_button_press_time_ms > 200) \
+        if (DimmerLib::current_time_ms - DimmerLib::last_debug_button_press_ms > 200) \
         { \
-            DimmerLib::last_button_press_time_ms = DimmerLib::current_time_ms; \
+            DimmerLib::last_debug_button_press_ms = DimmerLib::current_time_ms; \
              \
-            switch (DIMMER_OBJECT.mode) \
+            switch (DimmerLib::debug_mode) \
             { \
-            case DimmerLib::MANUAL: \
-                DIMMER_OBJECT.mode = DimmerLib::AUTO; \
+            case 1: \
+                DimmerLib::debug_mode = 0; \
                 break; \
              \
             default: \
-                DIMMER_OBJECT.mode = DimmerLib::MANUAL; \
+                DimmerLib::debug_mode = 1; \
                 break; \
             } \
         } \
@@ -59,6 +87,7 @@ namespace DimmerLib
         const uint16_t DELAY_TIME;
         const float K;
         const uint8_t MODE_BUTTON_PIN;
+        const uint8_t DEBUG_BUTTON_PIN;
         const uint8_t POT_PIN;
         const uint8_t CHANNEL;
         
@@ -77,6 +106,7 @@ namespace DimmerLib
          * @param SENSOR_PIN_ Analog pin to read light levels.
          * @param LED_PIN_ PWM-capable pin connected to the LED.
          * @param MODE_BUTTON_PIN_ Digital pin connected to mode toggle button (INPUT_PULLUP).
+         * @param DEBUG_BUTTON_PIN_ Digital pin connected to debug toggle button (INPUT_PULLUP).
          * @param POT_PIN_ Analog pin connected to potentiometer for manual dimming.
          * @param CHANNEL_ PWM channel (0–15 on ESP32).
          * @param mode_ Optional: Starting mode (AUTO or MANUAL).
@@ -89,6 +119,7 @@ namespace DimmerLib
             const uint8_t SENSOR_PIN_,
             const uint8_t LED_PIN_,
             const uint8_t MODE_BUTTON_PIN_,
+            const uint8_t DEBUG_BUTTON_PIN_,
             const uint8_t POT_PIN_,
             const uint8_t CHANNEL_,
             volatile uint8_t mode_ = AUTO,
@@ -107,6 +138,7 @@ namespace DimmerLib
         const uint8_t SENSOR_PIN_,
         const uint8_t LED_PIN_,
         const uint8_t MODE_BUTTON_PIN_,
+        const uint8_t DEBUG_BUTTON_PIN_,
         const uint8_t POT_PIN_,
         const uint8_t CHANNEL_,
         volatile uint8_t mode_,
@@ -120,12 +152,13 @@ namespace DimmerLib
         PART_DELAY(PART_DELAY_), POT_PIN(POT_PIN_),
         DELAY_TIME(POLLING_RATE_ - (AVERAGES_ * PART_DELAY_) / 1000),
         K(K_), MODE_BUTTON_PIN(MODE_BUTTON_PIN_),
-        mode(mode_), CHANNEL(CHANNEL_), ID(dimmer_id++)
+        mode(mode_), CHANNEL(CHANNEL_), ID(dimmer_id++), DEBUG_BUTTON_PIN(DEBUG_BUTTON_PIN_)
     {
         ledcSetup(CHANNEL, 490, 8);
         ledcAttachPin(LED_PIN, CHANNEL);
         pinMode(SENSOR_PIN, INPUT);
         pinMode(MODE_BUTTON_PIN, INPUT_PULLUP);
+        pinMode(DEBUG_BUTTON_PIN, INPUT_PULLUP);
     }
     
     LightSensingDimmer::~LightSensingDimmer()
@@ -136,8 +169,10 @@ namespace DimmerLib
 
     SemaphoreHandle_t semaphore_serial = xSemaphoreCreateBinary();
     
-    uint32_t last_button_press_time_ms = 0;
+    uint32_t last_mode_button_press_ms = 0;
+    uint32_t last_debug_button_press_ms = 0;
     uint32_t current_time_ms;
+    volatile uint8_t debug_mode = 0;
 
 
 
@@ -270,7 +305,12 @@ namespace DimmerLib
                 dimmer.sensor_value_average,
                 dimmer.K);
             ledcWrite(dimmer.CHANNEL, dimmer.led_value);
-            writeSerialSafe(dimmer);
+
+            if (debug_mode)
+            {
+                writeSerialSafe(dimmer);
+            }
+            
             delay(dimmer.DELAY_TIME);
             
             break;

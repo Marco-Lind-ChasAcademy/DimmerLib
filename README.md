@@ -9,7 +9,8 @@
 - Put task creation function into header: DONE
 - Implement thread sync mechanisms where needed. Binary semasphores: DONE
 - Test conflicting pins to ensure thread safety: DONE
-- Make button and ISR for debug mode (for serial prints, so that they don't always run)
+- Make button and ISR for debug mode (for serial prints, so that they don't always run): DONE
+- Add some sort or standardized way to schedule vTaskDelays in main. vTaskDelay(num_of_delays - 1)?
 
 # DimmerLib library
 
