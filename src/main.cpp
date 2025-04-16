@@ -20,7 +20,7 @@ void setup()
 {
   Serial.begin(115200);
 
-  DimmerLib::semInit(); // Initializing the pin semaphores
+  DimmerLib::semInit(); // Initializing the serial semaphore
 
   attachInterrupt(digitalPinToInterrupt(dimmer_0.MODE_BUTTON_PIN), dimmer_0_ISR, RISING);
   attachInterrupt(digitalPinToInterrupt(dimmer_1.MODE_BUTTON_PIN), dimmer_1_ISR, RISING);

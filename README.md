@@ -8,8 +8,8 @@
 - Put setupDimmer() into constructor instead: DONE
 - Put task creation function into header: DONE
 - Implement thread sync mechanisms where needed. Binary semasphores: DONE
-- Clean up switch statements. Maybe some other way? Lookup tables?
 - Test conflicting pins to ensure thread safety: DONE
+- Make button and ISR for debug mode (for serial prints, so that they don't always run)
 
 # DimmerLib library
 
