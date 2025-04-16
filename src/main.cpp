@@ -8,14 +8,14 @@ DimmerLib::LightSensingDimmer dimmer_2(A4, 21, 20, 10, A1, 2);
 DimmerLib::LightSensingDimmer dimmer_3(A4, 21, 20, 10, A0, 3);
 
 
-// Example with an ISR:s for all the dimmers
+// Example with mode switch ISR:s for all the dimmers
 MAKE_MODE_SWITCH_ISR(dimmer_0_mode_ISR, dimmer_0)
 MAKE_MODE_SWITCH_ISR(dimmer_1_mode_ISR, dimmer_1)
 MAKE_MODE_SWITCH_ISR(dimmer_2_mode_ISR, dimmer_2)
 MAKE_MODE_SWITCH_ISR(dimmer_3_mode_ISR, dimmer_3)
 
 
-
+// Example with debug ISR:s for all the dimmers
 MAKE_DEBUG_SWITCH_ISR(dimmer_0_debug_ISR, dimmer_0)
 MAKE_DEBUG_SWITCH_ISR(dimmer_1_debug_ISR, dimmer_1)
 MAKE_DEBUG_SWITCH_ISR(dimmer_2_debug_ISR, dimmer_2)
@@ -39,13 +39,10 @@ void setup()
   attachInterrupt(digitalPinToInterrupt(dimmer_2.DEBUG_BUTTON_PIN), dimmer_2_debug_ISR, RISING);
   attachInterrupt(digitalPinToInterrupt(dimmer_3.DEBUG_BUTTON_PIN), dimmer_3_debug_ISR, RISING);
 
-  xTaskCreate(DimmerLib::runDimmerTask, "Dimmer 0", 1024, &dimmer_0, configMAX_PRIORITIES - 1, NULL);
-  vTaskDelay(DimmerLib::dimmer_id - 1);
-  xTaskCreate(DimmerLib::runDimmerTask, "Dimmer 1", 1024, &dimmer_1, configMAX_PRIORITIES - 1, NULL);
-  vTaskDelay(DimmerLib::dimmer_id - 1);
-  xTaskCreate(DimmerLib::runDimmerTask, "Dimmer 2", 1024, &dimmer_2, configMAX_PRIORITIES - 1, NULL);
-  vTaskDelay(DimmerLib::dimmer_id - 1);
-  xTaskCreate(DimmerLib::runDimmerTask, "Dimmer 3", 1024, &dimmer_3, configMAX_PRIORITIES - 1, NULL);
+  INITIATE_DIMMER_TASK(dimmer_0, configMAX_PRIORITIES - 1);
+  INITIATE_DIMMER_TASK(dimmer_1, configMAX_PRIORITIES - 1);
+  INITIATE_DIMMER_TASK(dimmer_2, configMAX_PRIORITIES - 1);
+  INITIATE_DIMMER_TASK(dimmer_3, configMAX_PRIORITIES - 1);
 }
 
 void loop()

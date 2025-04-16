@@ -62,6 +62,15 @@ void ISR_NAME() \
        \
     }
 
+/**
+ * @brief Macro to dimmer task.
+ * 
+ * @param DIMMER_OBJECT Instance of LightSensingDimmer to operate on.
+ */
+#define INITIATE_DIMMER_TASK(DIMMER_OBJECT, PRIORITY) \
+xTaskCreate(DimmerLib::runDimmerTask, #DIMMER_OBJECT, 1024, &DIMMER_OBJECT, PRIORITY, NULL); \
+vTaskDelay(DimmerLib::dimmer_id - 1);
+
 
 
 namespace DimmerLib
