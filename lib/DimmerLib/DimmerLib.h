@@ -279,7 +279,7 @@ namespace DimmerLib
     {
         DimmerLib::LightSensingDimmer *dimmer = (DimmerLib::LightSensingDimmer *)pvParameter;
 
-        vTaskDelay(dimmer->POLLING_RATE / (DimmerLib::dimmer_id + 1) * dimmer->ID);
+        vTaskDelay(pdUS_TO_TICKS((dimmer->POLLING_RATE * 1000) / (DimmerLib::dimmer_id + 1)) * dimmer->ID);
         
         while (1)
         {
