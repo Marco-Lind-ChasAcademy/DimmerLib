@@ -1,6 +1,8 @@
 #ifndef DIMMERLIB_H
 #define DIMMERLIB_H
 
+#define pdUS_TO_TICKS(xTimeInUs) ( ( TickType_t ) ( ( ( TickType_t ) ( xTimeInUs ) * ( TickType_t ) configTICK_RATE_HZ ) / ( TickType_t ) 1000000U ) )
+
 
 #include <Arduino.h>
 
@@ -68,8 +70,7 @@ void ISR_NAME() \
  * @param DIMMER_OBJECT Instance of LightSensingDimmer to operate on.
  */
 #define INITIATE_DIMMER_TASK(DIMMER_OBJECT, PRIORITY) \
-xTaskCreate(DimmerLib::runDimmerTask, #DIMMER_OBJECT, 1024, &DIMMER_OBJECT, PRIORITY, NULL); \
-vTaskDelay(DimmerLib::dimmer_id - 1);
+xTaskCreate(DimmerLib::runDimmerTask, #DIMMER_OBJECT, 1024, &DIMMER_OBJECT, PRIORITY, NULL);
 
 
 
@@ -278,11 +279,13 @@ namespace DimmerLib
 
     void runDimmerTask(void *pvParameter)
     {
-        DimmerLib::LightSensingDimmer *dimmer_1 = (DimmerLib::LightSensingDimmer *)pvParameter;
+        DimmerLib::LightSensingDimmer *dimmer = (DimmerLib::LightSensingDimmer *)pvParameter;
+
+        vTaskDelay(dimmer->POLLING_RATE / (DimmerLib::dimmer_id + 1) * dimmer->ID);
         
         while (1)
         {
-            DimmerLib::runDimmer(*dimmer_1);
+            DimmerLib::runDimmer(*dimmer);
         }
       
     }
