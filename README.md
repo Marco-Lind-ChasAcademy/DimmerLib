@@ -1,5 +1,5 @@
 ### To do:
-- Optimizations. Alignment
+- Optimizations. Alignment: DONE
 - Custom namespace: DONE
 - Put button vars into Light_sensing_dimmer class or it's own: DONE
 - Make functions to simplify initialization in setup() and main(): DONE
