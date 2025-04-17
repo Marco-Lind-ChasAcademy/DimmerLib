@@ -76,9 +76,15 @@ xTaskCreate(DimmerLib::runDimmerTask, #DIMMER_OBJECT, 1024, &DIMMER_OBJECT, PRIO
 
 namespace DimmerLib
 {
-    enum modes { MANUAL, AUTO };;
     
+    SemaphoreHandle_t semaphore_serial = xSemaphoreCreateBinary();
+    uint32_t last_mode_button_press_ms = 0;
+    uint32_t last_debug_button_press_ms = 0;
+    uint32_t current_time_ms;
+    
+    volatile uint8_t debug_mode = 0;
     uint8_t dimmer_id = 0;
+    enum modes : uint8_t { MANUAL, AUTO };;
 
     /**
      * @brief Light-sensing dimmer class.
@@ -89,22 +95,23 @@ namespace DimmerLib
     class LightSensingDimmer
     {
     public:
-        const uint8_t SENSOR_PIN;
-        const uint8_t LED_PIN;
+        uint32_t sensor_value_sum;
+        const float K;
+
         const uint16_t POLLING_RATE;
-        const uint8_t AVERAGES;
         const uint16_t PART_DELAY;
         const uint16_t DELAY_TIME;
-        const float K;
+        uint16_t pot_value;
+        uint16_t sensor_value_average;
+
+        const uint8_t SENSOR_PIN;
+        const uint8_t LED_PIN;
+        const uint8_t AVERAGES;
         const uint8_t MODE_BUTTON_PIN;
         const uint8_t DEBUG_BUTTON_PIN;
         const uint8_t POT_PIN;
         const uint8_t CHANNEL;
-        
         volatile uint8_t mode;
-        uint16_t pot_value;
-        uint32_t sensor_value_sum;
-        uint16_t sensor_value_average;
         uint8_t led_value;
         const uint8_t ID;
 
@@ -174,15 +181,6 @@ namespace DimmerLib
     LightSensingDimmer::~LightSensingDimmer()
     {
     }
-
-
-
-    SemaphoreHandle_t semaphore_serial = xSemaphoreCreateBinary();
-    
-    uint32_t last_mode_button_press_ms = 0;
-    uint32_t last_debug_button_press_ms = 0;
-    uint32_t current_time_ms;
-    volatile uint8_t debug_mode = 0;
 
 
 
@@ -281,7 +279,7 @@ namespace DimmerLib
     {
         DimmerLib::LightSensingDimmer *dimmer = (DimmerLib::LightSensingDimmer *)pvParameter;
 
-        vTaskDelay(dimmer->POLLING_RATE / (DimmerLib::dimmer_id + 1) * dimmer->ID);
+        vTaskDelay(pdUS_TO_TICKS((dimmer->POLLING_RATE * 1000) / (DimmerLib::dimmer_id + 1)) * dimmer->ID);
         
         while (1)
         {
