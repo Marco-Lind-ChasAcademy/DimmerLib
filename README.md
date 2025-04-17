@@ -13,7 +13,7 @@
 - Add some sort or standardized way to schedule vTaskDelays in main. vTaskDelay(num_of_delays - 1): DONE
 - Add function or macro for task initialization in main: DONE
 - Update README
-- Replace delayMicroseconds with something more optimized...?
+- Replace delayMicroseconds with something more optimized: DONE
 
 # DimmerLib library
 

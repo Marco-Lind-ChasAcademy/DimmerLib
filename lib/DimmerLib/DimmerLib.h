@@ -42,27 +42,27 @@ void ISR_NAME() \
  * @param DIMMER_OBJECT Instance of LightSensingDimmer to operate on.
  */
 #define MAKE_DEBUG_SWITCH_ISR(ISR_NAME, DIMMER_OBJECT) \
-    void ISR_NAME() \
+void ISR_NAME() \
+{ \
+    DimmerLib::current_time_ms = millis(); \
+    \
+    if (DimmerLib::current_time_ms - DimmerLib::last_debug_button_press_ms > 200) \
     { \
-        DimmerLib::current_time_ms = millis(); \
-        \
-        if (DimmerLib::current_time_ms - DimmerLib::last_debug_button_press_ms > 200) \
+        DimmerLib::last_debug_button_press_ms = DimmerLib::current_time_ms; \
+         \
+        switch (DimmerLib::debug_mode) \
         { \
-            DimmerLib::last_debug_button_press_ms = DimmerLib::current_time_ms; \
-             \
-            switch (DimmerLib::debug_mode) \
-            { \
-            case 1: \
-                DimmerLib::debug_mode = 0; \
-                break; \
-             \
-            default: \
-                DimmerLib::debug_mode = 1; \
-                break; \
-            } \
+        case 1: \
+            DimmerLib::debug_mode = 0; \
+            break; \
+         \
+        default: \
+            DimmerLib::debug_mode = 1; \
+            break; \
         } \
-       \
-    }
+    } \
+   \
+}
 
 /**
  * @brief Macro to dimmer task.
@@ -336,7 +336,7 @@ namespace DimmerLib
         for (int i = 0; i < AVERAGES; i++)
         {
             sensor_value_sum += analogRead(SENSOR_PIN);
-            delayMicroseconds(PART_DELAY);
+            vTaskDelay(pdUS_TO_TICKS(PART_DELAY));
         }
 
     }
