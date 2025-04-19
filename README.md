@@ -1,18 +1,20 @@
 # DimmerLib library
 
 ## Overview
-The **DimmerLib library** is an easy to use, **Arduino-compatible** library designed for the **ESP32** microcontroller. It automatically adjusts the brightness of an LED based on ambient light levels. It follows the **inverse square law** to provide a natural perception of brightness changes and includes **anti-flickering** mechanisms to cancel out fluctuations at **50-60 Hz**. Designed for **ease of use**, this library allows seamless integration into projects requiring automatic LED dimming.
+The **DimmerLib library** is an easy-to-use, **Arduino-compatible** library designed for the **ESP32** microcontroller. It automatically adjusts the brightness of an LED based on ambient light levels. It follows the **inverse square law** to provide a natural perception of brightness changes and includes **anti-flickering** mechanisms to cancel out **50–60 Hz** interference. Designed for **thread-safe multitasking**, this library integrates seamlessly with **FreeRTOS** on the ESP32.
 
 ## Features
 - **Adaptive brightness**: Dynamically adjusts LED brightness based on ambient light.
 - **Inverse square law mapping**: Ensures smooth and natural transitions in brightness.
 - **Anti-flickering design**: Reduces flickering effects caused by power fluctuations at 50-60 Hz by default.
+- **Multithreaded with FreeRTOS**: Each dimmer runs in its own task with safe access to Serial.
 - **Configurable parameters**: Allows users to customize sampling rate, delay time, and mapping curve.
-- **Serial output for debugging**: Provides real-time sensor readings and LED values.
-- **ISR macro**: Provides a standardized macro for easy ISR creation.
+- **Manual and automatic modes**: Toggle between potentiometer control and light-sensing.
+- **Debug mode toggle**: Enable/disable serial output on-the-fly via a button ISR.
+- **ISR macros**: Standardized macros simplify the creation of button ISRs.
 - **Designed for ESP32**: Optimized for the ESP32 platform.
-- **Tested on ESP32-C3 Super Mini**: Verified to work on this specific board.
 - **Built using PlatformIO**: Developed and tested with the PlatformIO environment.
+- **Tested on ESP32-C3 Super Mini**
 
 ## Installation
 To use the DimmerLib library, include the header file in your Arduino project:
@@ -27,27 +29,32 @@ To use the DimmerLib library, include the header file in your Arduino project:
 Create a `LightSensingDimmer` object by specifying the following parameters:
 
 ```cpp
-DimmerLib::LightSensingDimmer dimmer(A4, 6, 5, A3, 0);
+DimmerLib::LightSensingDimmer dimmer(A4, 6, 5, 7, A2 0);
 ```
 
 - `SENSOR_PIN_` – Analog pin to read light levels.
 - `LED_PIN_` – PWM-capable pin connected to the LED.
 - `MODE_BUTTON_PIN_` – Digital pin connected to mode toggle button (INPUT_PULLUP).
+- `DEBUG_BUTTON_PIN_` – Digital pin to toggle serial debug output.
 - `POT_PIN_` – Analog pin connected to potentiometer for manual dimming.
 - `CHANNEL_` – PWM channel (0–15 on ESP32).
-- `mode_` – **Optional**: Starting mode (AUTO or MANUAL).
-- `K_` – **Optional**: Exponential scaling factor for brightness mapping.
-- `POLLING_RATE_` – **Optional**: Update rate in ms.
-- `AVERAGES_` – **Optional**: Number of light samples to average.
-- `PART_DELAY_` – **Optional**: Microsecond delay between samples.
+- `mode_` – *(Optional)* Starting mode (`AUTO` or `MANUAL`).
+- `K_` – *(Optional)* Exponential brightness curve factor.
+- `POLLING_RATE_` – *(Optional)* Delay between each update (in ms).
+- `AVERAGES_` – *(Optional)* Number of light samples to average.
+- `PART_DELAY_` – *(Optional)* Microsecond delay between light samples.
 
-If optional fields are left empty, the object will default to settings optimized for 50-60 Hz anti-flickering.
+If optional fields are left empty, the object will default to settings optimized to reduce flickering at 50-60 Hz.
 
 ### Example Code
-```cpp
-DimmerLib::LightSensingDimmer dimmer(A4, 6, 5, A3, 0);
 
-MAKE_MODE_SWITCH_ISR(dimmer_ISR, dimmer)
+#### Arduino:
+
+```cpp
+DimmerLib::LightSensingDimmer dimmer(A4, 6, 5, 7, A2, 0);
+
+MAKE_MODE_SWITCH_ISR(modeSwitchISR, dimmer)
+MAKE_DEBUG_SWITCH_ISR(debugSwitchISR, dimmer)
 
 void setup()
 {
@@ -55,12 +62,42 @@ void setup()
 
   DimmerLib::semInit();
 
-  attachInterrupt(digitalPinToInterrupt(dimmer_1.MODE_BUTTON_PIN), dimmer_ISR, RISING);
+  attachInterrupt(digitalPinToInterrupt(dimmer.MODE_BUTTON_PIN), modeSwitchISR, RISING);
+  attachInterrupt(digitalPinToInterrupt(dimmer.DEBUG_BUTTON_PIN), debugSwitchISR, RISING);
 }
 
 void loop()
 {
   DimmerLib::runDimmer(dimmer);
+}
+```
+
+#### FreeRTOS:
+
+```cpp
+DimmerLib::LightSensingDimmer dimmer_0(A4, 6, 5, 7, A2, 0);
+DimmerLib::LightSensingDimmer dimmer_1(A4, 8, 9, 7, A3, 1);
+
+MAKE_MODE_SWITCH_ISR(modeSwitchISR_0, dimmer_0)
+MAKE_MODE_SWITCH_ISR(modeSwitchISR_1, dimmer_1)
+MAKE_DEBUG_SWITCH_ISR(debugSwitchISR, dimmer_0)
+
+void setup()
+{
+  Serial.begin(115200);
+
+  DimmerLib::semInit();
+
+  attachInterrupt(digitalPinToInterrupt(dimmer.MODE_BUTTON_PIN), modeSwitchISR_0, RISING);
+  attachInterrupt(digitalPinToInterrupt(dimmer.MODE_BUTTON_PIN), modeSwitchISR_1, RISING);
+  attachInterrupt(digitalPinToInterrupt(dimmer.DEBUG_BUTTON_PIN), debugSwitchISR, RISING);
+
+  INITIATE_DIMMER_TASK(dimmer_0, 1);
+  INITIATE_DIMMER_TASK(dimmer_1, 1);
+}
+
+void loop()
+{
 }
 ```
 
@@ -127,8 +164,50 @@ Main control loop for the dimmer. Should be called repeatedly in `loop()`.
 
 ---
 
+### `void runDimmerTask(void *pvParameter)`
+FreeRTOS task for `runDimmer()`.
+
+- **Behavior:**
+  - Runs a `runDimmer()`-based task
+
+- **Parameters:**
+  - `pvParameter`: for `xTaskCreate()`.
+
+---
+
+### `void writeSerialSafe(uint8_t led_value, uint16_t sensor_value_average)`
+Writes serial output in thread-safe manner.
+
+- **Behavior:**
+  - Runs a `runDimmer()`-based task
+
+- **Parameters:**
+  - `led_value`: Dimmer object LED output value.
+  - `sensor_value_average`: Dimmer object average sensor value.
+
+---
+
+### `void semInit()`
+Initializes semaphores.
+
+- **Behavior:**
+  - Runs xSemaphoreGive() for the Serial semaphore
+
+- **Parameters:**
+
+---
+
 ### `MAKE_MODE_SWITCH_ISR(ISR_NAME, DIMMER_OBJECT)`
 Macro to create a mode-switching ISR that toggles between `AUTO` and `MANUAL` modes.
+
+- **Parameters:**
+  - `ISR_NAME`: Desired name for the ISR function.
+  - `DIMMER_OBJECT`: Instance of `LightSensingDimmer` to operate on.
+
+---
+
+### `MAKE_DEBUG_SWITCH_ISR(ISR_NAME, DIMMER_OBJECT)`
+Macro to create a debug ISR that toggles switches serial prints on or off.
 
 - **Parameters:**
   - `ISR_NAME`: Desired name for the ISR function.
@@ -144,13 +223,14 @@ LightSensingDimmer(
     uint8_t SENSOR_PIN_,
     uint8_t LED_PIN_,
     uint8_t MODE_BUTTON_PIN_,
+    uint8_t DEBUG_BUTTON_PIN_,
     uint8_t POT_PIN_,
     uint8_t CHANNEL_,
     volatile uint8_t mode_ = AUTO,
+    float K_ = 2.0,
     uint8_t POLLING_RATE_ = 100,
     uint8_t AVERAGES_ = 20,
-    uint16_t PART_DELAY_ = 2500,
-    float K_ = 2.0
+    uint16_t PART_DELAY_ = 2500
 )
 ```
 
