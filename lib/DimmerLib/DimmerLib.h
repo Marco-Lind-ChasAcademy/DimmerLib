@@ -76,6 +76,9 @@ xTaskCreate(DimmerLib::runDimmerTask, #DIMMER_OBJECT, 1024, &DIMMER_OBJECT, PRIO
 
 namespace DimmerLib
 {
+    uint64_t last_micros;
+    uint64_t current_micros;
+    uint64_t interval_micros;
     
     SemaphoreHandle_t semaphore_serial = xSemaphoreCreateBinary();
     uint32_t last_mode_button_press_ms = 0;
@@ -114,6 +117,8 @@ namespace DimmerLib
         volatile uint8_t mode;
         uint8_t led_value;
         const uint8_t ID;
+        uint8_t state;
+        uint8_t counter;
 
         /**
          * @brief Constructor to initialize a LightSensingDimmer object.
@@ -169,7 +174,8 @@ namespace DimmerLib
         PART_DELAY(PART_DELAY_), POT_PIN(POT_PIN_),
         DELAY_TIME(POLLING_RATE_ - (AVERAGES_ * PART_DELAY_) / 1000),
         K(K_), MODE_BUTTON_PIN(MODE_BUTTON_PIN_),
-        mode(mode_), CHANNEL(CHANNEL_), ID(dimmer_id++), DEBUG_BUTTON_PIN(DEBUG_BUTTON_PIN_)
+        mode(mode_), CHANNEL(CHANNEL_), ID(dimmer_id++),
+        DEBUG_BUTTON_PIN(DEBUG_BUTTON_PIN_), sensor_value_sum(0)
     {
         ledcSetup(CHANNEL, 490, 8);
         ledcAttachPin(LED_PIN, CHANNEL);
@@ -201,7 +207,7 @@ namespace DimmerLib
      * @param sensor_value_sum Accumulated sum of sensor readings.
      * @param AVERAGES Number of samples used in the sum.
      */
-    inline void averageLight(uint16_t &sensor_value_average, uint32_t sensor_value_sum, const uint8_t AVERAGES);
+    inline void averageLight(uint16_t &sensor_value_average, uint32_t &sensor_value_sum, const uint8_t AVERAGES);
 
     /**
      * @brief Applies an exponential mapping to the averaged sensor value to determine LED brightness.
@@ -296,32 +302,62 @@ namespace DimmerLib
             dimmer.pot_value = analogRead(dimmer.POT_PIN);
             mapLed(dimmer.led_value, dimmer.pot_value, dimmer.K);
             ledcWrite(dimmer.CHANNEL, dimmer.led_value);
-            delay(dimmer.POLLING_RATE);
             
             break;
         
         default:
-            measureLight(
-                dimmer.sensor_value_sum,
-                dimmer.AVERAGES,
-                dimmer.SENSOR_PIN,
-                dimmer.PART_DELAY);
-            averageLight(
-                dimmer.sensor_value_average,
-                dimmer.sensor_value_sum,
-                dimmer.AVERAGES);
-            mapLed(
-                dimmer.led_value,
-                dimmer.sensor_value_average,
-                dimmer.K);
-            ledcWrite(dimmer.CHANNEL, dimmer.led_value);
-
-            if (debug_mode)
+            switch (dimmer.state)
             {
-                writeSerialSafe(dimmer);
-            }
+            case 0:
+                while (dimmer.counter < dimmer.AVERAGES)
+                {
+                    measureLight
+                    (
+                        dimmer.sensor_value_sum,
+                        dimmer.AVERAGES,
+                        dimmer.SENSOR_PIN,
+                        dimmer.PART_DELAY
+                    );
+
+                    /* Serial.print("Measurement ");
+                    Serial.print(dimmer.counter);
+                    Serial.print(" DONE: sensor_value_sum = ");
+                    Serial.println(dimmer.sensor_value_sum); */
+
+                    dimmer.counter += 1;
+                    
+                    return;
+                }
+
+                dimmer.counter = 0;
+                dimmer.state = 1;
+
+                //Serial.println("Case: 0 DONE");
+                break;
             
-            delay(dimmer.DELAY_TIME);
+            case 1:
+                averageLight(
+                    dimmer.sensor_value_average,
+                    dimmer.sensor_value_sum,
+                    dimmer.AVERAGES);
+                mapLed(
+                    dimmer.led_value,
+                    dimmer.sensor_value_average,
+                    dimmer.K);
+                ledcWrite(dimmer.CHANNEL, dimmer.led_value);
+
+                if (debug_mode)
+                {
+                    writeSerial(dimmer);
+                }
+
+                dimmer.state = 0;
+                //Serial.println("Case: 1 DONE");
+                break;
+
+            default:
+                break;
+            }
             
             break;
         }
@@ -329,19 +365,15 @@ namespace DimmerLib
     
     inline void measureLight(uint32_t &sensor_value_sum, const uint8_t AVERAGES, const uint8_t SENSOR_PIN, const uint16_t PART_DELAY)
     {
-        sensor_value_sum = 0;
-        
-        for (int i = 0; i < AVERAGES; i++)
-        {
-            sensor_value_sum += analogRead(SENSOR_PIN);
-            vTaskDelay(pdUS_TO_TICKS(PART_DELAY));
-        }
-
+        sensor_value_sum += analogRead(SENSOR_PIN);
     }
     
-    inline void averageLight(uint16_t &sensor_value_average, uint32_t sensor_value_sum, const uint8_t AVERAGES)
+    inline void averageLight(uint16_t &sensor_value_average, uint32_t &sensor_value_sum, const uint8_t AVERAGES)
     {
         sensor_value_average = sensor_value_sum / AVERAGES;
+        /* Serial.print("sensor_value_average = ");
+        Serial.println(sensor_value_average); */
+        sensor_value_sum = 0;
     }
     
     inline void mapLed(uint8_t &led_value, uint16_t sensor_value_average, const float K)
