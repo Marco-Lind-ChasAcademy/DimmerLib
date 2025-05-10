@@ -263,6 +263,8 @@ namespace DimmerLib
      * 
      */
     void semInit();
+    
+    void runDimmerCoro(LightSensingDimmer& dimmer);
 
     void delays(LightSensingDimmer& dimmer, uint64_t time_taken);
 
@@ -358,6 +360,45 @@ namespace DimmerLib
     }
 
     void runDimmer(LightSensingDimmer& dimmer)
+    {
+        switch (dimmer.mode)
+        {
+        case MANUAL:
+            dimmer.pot_value = analogRead(dimmer.POT_PIN);
+            mapLed(dimmer.led_value, dimmer.pot_value, dimmer.K);
+            ledcWrite(dimmer.CHANNEL, dimmer.led_value);
+            delay(dimmer.POLLING_RATE);
+            
+            break;
+        
+        default:
+            measureLight(
+                dimmer.sensor_value_sum,
+                dimmer.AVERAGES,
+                dimmer.SENSOR_PIN,
+                dimmer.PART_DELAY);
+            averageLight(
+                dimmer.sensor_value_average,
+                dimmer.sensor_value_sum,
+                dimmer.AVERAGES);
+            mapLed(
+                dimmer.led_value,
+                dimmer.sensor_value_average,
+                dimmer.K);
+            ledcWrite(dimmer.CHANNEL, dimmer.led_value);
+
+            if (debug_mode)
+            {
+                writeSerialSafe(dimmer);
+            }
+            
+            delay(dimmer.DELAY_TIME);
+            
+            break;
+        }
+    }
+
+    void runDimmerCoro(LightSensingDimmer& dimmer)
     {
         switch (dimmer.mode)
         {
