@@ -111,16 +111,20 @@ void loop()
   DimmerLib::current_micros = micros();
   DimmerLib::interval_micros = DimmerLib::current_micros - DimmerLib::last_micros;
 
-
-
-  Serial.println(DimmerLib::interval_micros);
-
+  /* Serial.print("Time taken: ");
+  Serial.print(DimmerLib::interval_micros);
+  Serial.println(" microseconds"); */
 
 
   switch (dimmer_0.mode)
   {
   case DimmerLib::MANUAL:
     delay((dimmer_0.POLLING_RATE * 1000 - DimmerLib::interval_micros) / 1000);
+
+    /* Serial.print("Sleeping for ");
+    Serial.print(dimmer_0.POLLING_RATE);
+    Serial.println("ms"); */
+
 
     break;
   
@@ -136,37 +140,35 @@ void loop()
       }
       delayMicroseconds(dimmer_0.PART_DELAY - DimmerLib::interval_micros);
 
+      /* Serial.print("Sleeping for ");
+      Serial.print(dimmer_0.PART_DELAY);
+      Serial.println("us"); */
+
       break;
     
     case 1:
       delay((dimmer_0.DELAY_TIME * 1000 - DimmerLib::interval_micros) / 1000);
 
+      /* Serial.print("Sleeping for ");
+      Serial.print(dimmer_0.DELAY_TIME);
+      Serial.println("ms"); */
+
+      break;
+      
+    case 2:
       break;
 
     default:
-      Serial.println("Invalid state.");
+      Serial.println("Invalid state");
 
       break;
     }
 
-      break;
+    break;
 
   default:
     Serial.println("Invalid mode.");
-
-
-
-
-
-
-
-
-
-
-
-
-
+    
     break;
   }
-
 }

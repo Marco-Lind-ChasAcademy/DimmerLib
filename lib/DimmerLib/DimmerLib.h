@@ -309,7 +309,8 @@ namespace DimmerLib
             switch (dimmer.state)
             {
             case 0:
-                while (dimmer.counter < dimmer.AVERAGES)
+                restart:
+                if (dimmer.counter < dimmer.AVERAGES)
                 {
                     measureLight
                     (
@@ -319,9 +320,11 @@ namespace DimmerLib
                         dimmer.PART_DELAY
                     );
 
-                    /* Serial.print("Measurement ");
+                    /* Serial.print("Dimmer ");
+                    Serial.print(dimmer.ID);
+                    Serial.print(": Measurement ");
                     Serial.print(dimmer.counter);
-                    Serial.print(" DONE: sensor_value_sum = ");
+                    Serial.print(" is DONE, sensor_value_sum: ");
                     Serial.println(dimmer.sensor_value_sum); */
 
                     dimmer.counter += 1;
@@ -332,30 +335,62 @@ namespace DimmerLib
                 dimmer.counter = 0;
                 dimmer.state = 1;
 
-                //Serial.println("Case: 0 DONE");
-                break;
-            
+                /* Serial.print("Dimmer ");
+                Serial.print(dimmer.ID);
+                Serial.println(": Case 0 is DONE"); */
+                
             case 1:
-                averageLight(
-                    dimmer.sensor_value_average,
-                    dimmer.sensor_value_sum,
-                    dimmer.AVERAGES);
-                mapLed(
-                    dimmer.led_value,
-                    dimmer.sensor_value_average,
-                    dimmer.K);
-                ledcWrite(dimmer.CHANNEL, dimmer.led_value);
-
-                if (debug_mode)
+                if (dimmer.counter < 1)
                 {
-                    writeSerial(dimmer);
+                    averageLight(
+                        dimmer.sensor_value_average,
+                        dimmer.sensor_value_sum,
+                        dimmer.AVERAGES);
+                    mapLed(
+                        dimmer.led_value,
+                        dimmer.sensor_value_average,
+                        dimmer.K);
+                    ledcWrite(dimmer.CHANNEL, dimmer.led_value);
+    
+                    if (debug_mode)
+                    {
+                        writeSerial(dimmer);
+                    }
+
+                    dimmer.counter += 1;
+
+                    /* Serial.print("Dimmer ");
+                    Serial.print(dimmer.ID);
+                    Serial.println(": Case 1 subtasks are DONE"); */
+
+                    return;
                 }
 
+                dimmer.counter = 0;
+                
+                /* Serial.print("Dimmer ");
+                Serial.print(dimmer.ID);
+                Serial.println(": Case 1 is DONE"); */
+
+                dimmer.state = 2;
+
+                break;
+
+            case 2:
+                /* Serial.print("Dimmer ");
+                Serial.print(dimmer.ID);
+                Serial.println(": Case 2 is DONE"); */
+
                 dimmer.state = 0;
-                //Serial.println("Case: 1 DONE");
+
+                goto restart;
+
                 break;
 
             default:
+                /* Serial.print("Invalid state, dimmer: ");
+                Serial.println(dimmer.ID); */
+
                 break;
             }
             
