@@ -264,7 +264,70 @@ namespace DimmerLib
      */
     void semInit();
 
+    void delays(LightSensingDimmer& dimmer, uint64_t time_taken);
 
+
+
+    void delays(LightSensingDimmer& dimmer, uint64_t time_taken)
+    {
+        switch (dimmer.mode)
+        {
+        case MANUAL:
+            delay((dimmer.POLLING_RATE * 1000 - time_taken) / 1000);
+            
+            /* Serial.print("Manual dimming done. Slept for ");
+            Serial.print((dimmer.POLLING_RATE * 1000 - time_taken) / 1000);
+            Serial.println("ms..."); */
+            
+            
+            break;
+            
+        case AUTO:
+            switch (dimmer.state)
+            {
+            case 0:
+                while (dimmer.PART_DELAY - time_taken >= 1000)
+                {
+                    delay(1);
+                    current_micros = micros();
+                    time_taken = current_micros - last_micros;
+                }
+                delayMicroseconds(dimmer.PART_DELAY - time_taken);
+              
+                /* Serial.print("Measurements done. Slept for ");
+                Serial.print(dimmer.PART_DELAY - time_taken);
+                Serial.println("us..."); */
+              
+                break;
+              
+            case 1:
+                delay((dimmer.DELAY_TIME * 1000 - time_taken) / 1000);
+                
+                /* Serial.print("Dimming done. Slept for ");
+                Serial.print((dimmer.DELAY_TIME * 1000 - time_taken) / 1000);
+                Serial.println("ms..."); */
+                
+                break;
+
+            case 2:
+                //Serial.println("Everything done. Now restarting...\n");
+
+                break;
+            
+            default:
+                Serial.println("Invalid state");
+                
+                break;
+            }
+          
+            break;
+          
+        default:
+            Serial.println("Invalid mode.");
+            
+            break;
+        }
+    }
 
     void semInit()
     {
